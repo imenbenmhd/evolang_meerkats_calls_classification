@@ -1,0 +1,35 @@
+2022-12-06 16:59:32,556 INFO gridtk: Starting job 13: /idiap/temp/ibmahmoud/miniconda3/envs/evolang/bin/python train_svm.py
+Traceback (most recent call last):
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/train_svm.py", line 33, in <module>
+    svm.fit(X_train,y_train)
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/svm.py", line 51, in fit
+    self._lambduh, misclassification_error = self.compute_optimal_lambda()
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/svm.py", line 119, in compute_optimal_lambda
+    cross_validation_error = self.cross_validation_error()
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/svm.py", line 112, in cross_validation_error
+    error_per_fold[j] = svm.compute_misclassification_error(x_test, y_test)
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/svm.py", line 128, in compute_misclassification_error
+    y_pred = self.predict(x)
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/svm.py", line 134, in predict
+    return self._predict_ovr(x)
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/svm.py", line 310, in _predict_ovr
+    pred_prob = self._prediction_prob(alpha, x, x_train_filtered)
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/svm.py", line 315, in _prediction_prob
+    return xp.dot(self._kernel_eval(x, x_train).T, alpha)
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/svm.py", line 259, in _kernel_eval
+    keval = kernels.kernel_dict[self._kernel](x_train, x, self._kernel_params)
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/kernels.py", line 12, in kernel_rbf
+    return xp.exp(-xp.linalg.norm(xp.subtract(x1[:, :, xp.newaxis], x2[:, :, xp.newaxis].T), axis=1)**2/params['sigma']**2)
+  File "cupy/_core/_kernel.pyx", line 1285, in cupy._core._kernel.ufunc.__call__
+  File "cupy/_core/_kernel.pyx", line 638, in cupy._core._kernel._get_out_args_from_optionals
+  File "cupy/_core/core.pyx", line 2762, in cupy._core.core._ndarray_init
+  File "cupy/_core/core.pyx", line 241, in cupy._core.core._ndarray_base._init_fast
+  File "cupy/cuda/memory.pyx", line 742, in cupy.cuda.memory.alloc
+  File "cupy/cuda/memory.pyx", line 1419, in cupy.cuda.memory.MemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1440, in cupy.cuda.memory.MemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1120, in cupy.cuda.memory.SingleDeviceMemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1141, in cupy.cuda.memory.SingleDeviceMemoryPool._malloc
+  File "cupy/cuda/memory.pyx", line 1379, in cupy.cuda.memory.SingleDeviceMemoryPool._try_malloc
+cupy.cuda.memory.OutOfMemoryError: Out of memory allocating 16,575,918,080 bytes (allocated so far: 5,629,142,528 bytes).
+2022-12-06 17:00:31,127 INFO gridtk: Job 13 finished with result 1
+bash: line 1: kill: (204347) - No such process

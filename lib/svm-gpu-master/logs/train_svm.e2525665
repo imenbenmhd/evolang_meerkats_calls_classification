@@ -1,0 +1,7 @@
+2022-12-06 16:33:54,447 INFO gridtk: Starting job 8: /idiap/temp/esarkar/miniconda/envs/pytorch_vad/bin/python train_svm.py
+Traceback (most recent call last):
+  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/svm_meerkats/svm-gpu-master/train_svm.py", line 6, in <module>
+    import cupy as xp
+ModuleNotFoundError: No module named 'cupy'
+2022-12-06 16:34:04,457 INFO gridtk: Job 8 finished with result 1
+bash: line 1: kill: (903229) - No such process
