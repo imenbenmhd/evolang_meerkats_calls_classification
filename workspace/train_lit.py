@@ -55,10 +55,10 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name= "change_val_size",project="meerkats-subseg")
+wandb_logger = WandbLogger(name= "kfold_novalset",project="meerkats-subseg")
 
 EPOCHS = 100
-kfold=False
+kfold=True
 
 if __name__ == "__main__":
     # Data
@@ -108,51 +108,44 @@ if __name__ == "__main__":
 
         trainer.test(model, ckpt_path='best', dataloaders=test_loader)
 
-        #pre = trainer.predict(dataloaders=test_loader)
-        #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-        #predictions=torch.tensor(()).to(device)
-        #targets=torch.tensor(()).to(device)
-        #for i,x in pre:
-         #   pred=torch.argmax(i,dim=1)
-          #  predictions= torch.cat((predictions, pred), 0)
-          #  targets=torch.cat((targets,x),0)
-        #confmat = ConfusionMatrix(num_classes=9).to(device)
-        #targets=targets.type(torch.int64)
-        #predictions=predictions.type(torch.int64)
-        #matrix=confmat(predictions, targets)
-          
-
-        #trainer.test(model, ckpt_path='best', dataloaders=test_loader)
+  
 
     else:
     # k-folds
         k_folds=5
         kfold=KFold(n_splits=k_folds,shuffle=True)
-        dataset=ConcatDataset([data_test,val_dataset])
-        for fold,(train_ids,val_ids) in enumerate(kfold.split(dataset)):
+        dataset=ConcatDataset([data_train,val_dataset])
+        
+        for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset)):
             print(f'Fold {fold}')
+            num_train = len(train_ids)
+            indices = list(range(num_train))
+            split = int(numpy.floor(0.2* num_train))
 
-            train_subsampler=torch.utils.data.SubsetRandomSampler(train_ids)
-            val_subsampler=torch.utils.data.SubsetRandomSampler(val_ids)
+ 
+
+            train_idx, valid_idx = indices[split:], indices[:split]
+
+            train_subsampler=torch.utils.data.SubsetRandomSampler(train_idx)
+            val_subsampler=torch.utils.data.SubsetRandomSampler(valid_idx)
+            test_subsampler=torch.utils.data.SubsetRandomSampler(test_ids)
+
     # Dataloader in this fold
-            train_loader = DataLoader(dataset, batch_size=BATCH_SIZE,sampler=train_subsampler, collate_fn=utils.collate_fn)
-            val_loader = DataLoader(dataset, batch_size=BATCH_SIZE,sampler=val_subsampler, collate_fn=utils.collate_fn)
-            test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=utils.collate_fn)
+            train_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=train_subsampler, collate_fn=utils.collate_fn,num_workers=4)
+            val_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=val_subsampler, collate_fn=utils.collate_fn,num_workers=4)
+            test_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=test_subsampler, shuffle=False, collate_fn=utils.collate_fn,num_workers=4)
 
     
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # Instantiate model
-            model = Lit(HannahCNN(n_input=1, n_output=num_classes),fold=fold,weight=weights.to(device))
-    # print(model)
+            es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
 
-    # Trains
-            early_stop_callback=pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc",min_delta=0.00,patience=3,verbose=False,mode="max")
-            trainer = pl.Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[early_stop_callback])
+            trainer = pl.Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[es])
+                
+            model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing,weight=weights)
+
+            trainer.tune(model,train_dataloaders=train_loader)
             trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)
-
-    # Validate
             trainer.validate(model, ckpt_path='best', dataloaders=val_loader)
 
-    # Test
             trainer.test(model, ckpt_path='best', dataloaders=test_loader)

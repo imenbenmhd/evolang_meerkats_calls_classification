@@ -61,7 +61,7 @@ class PalazCNN(nn.Module):
         #x=self.flatten(x)
         #x = self.fc1(x)
         
-        return x,intermediate
+        return x
     
     
         

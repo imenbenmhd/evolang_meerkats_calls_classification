@@ -1,3 +1,0 @@
-../../thread/thread_load.cuh(36): warning: cuda.h: [jitify] File not found
-../../thread/thread_store.cuh(36): warning: cuda.h: [jitify] File not found
-0.5863874345549738

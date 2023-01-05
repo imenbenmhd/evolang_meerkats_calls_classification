@@ -1,6 +1,0 @@
-2022-12-22 17:58:42,966 INFO gridtk: Starting job 14: /idiap/temp/esarkar/miniconda/envs/pytorch_vad/bin/python train_svm.py
-Traceback (most recent call last):
-  File "/remote/idiap.svm/temp.masterai/ibmahmoud/evolang/Meerkats_project/svm_meerkats/svm-gpu-master/train_svm.py", line 6, in <module>
-    import cupy as xp
-ModuleNotFoundError: No module named 'cupy'
-2022-12-22 17:58:47,554 INFO gridtk: Job 14 finished with result 1

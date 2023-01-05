@@ -1,2 +1,0 @@
-2022-12-02 11:12:13,522 INFO gridtk: Starting job 5: /idiap/temp/ibmahmoud/miniconda3/envs/evolang/bin/python train_svm.py
-2022-12-02 11:13:10,023 INFO gridtk: Job 5 finished with result 0
