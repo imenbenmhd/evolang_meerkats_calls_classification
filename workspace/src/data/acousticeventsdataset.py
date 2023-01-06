@@ -14,7 +14,7 @@ import json
 import glob
 import os
 
-class NCCRMeerkatsDataset(Dataset):
+class AEDataset(Dataset):
     def __init__(self,
                 audio_dir=None,
                 class_to_index=None,
@@ -50,20 +50,28 @@ class NCCRMeerkatsDataset(Dataset):
         
         
         # Read all file paths
+        if self.train:
+            filelist = pd.DataFrame(librosa.util.find_files(os.path.join(self.audio_dir,"train"), ext=['wav']), columns=['path'])
+
         if self.train == False:
-        	
-        	filelist = pd.DataFrame(librosa.util.find_files(os.path.join(self.audio_dir,"test", ext=['wav']), columns=['path'])
-        else:
-        	filelist = pd.DataFrame(librosa.util.find_files(os.path.join(self.audio_dir,"train", ext=['wav']), columns=['path'])
+        	filelist = pd.DataFrame(librosa.util.find_files(os.path.join(self.audio_dir,"test"), ext=['wav']), columns=['path'])
+        
+        
+
+
 
 
 
        
        
         # Make dataframe
+    
+
         filelist['file_name'] = filelist.path.apply(lambda x: x.split('/')[-1])
         filelist['class_name'] = filelist.path.apply(lambda x: x.split('/')[-2])
         filelist['class_index'] = filelist.class_name.apply(lambda x: self.class_to_index[x])
+
+        return filelist
 
 
         
@@ -71,7 +79,6 @@ class NCCRMeerkatsDataset(Dataset):
             
 
 
-	return filelist
         
         
     
@@ -123,21 +130,22 @@ if __name__ == "__main__":
     # CUDA
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Device:', device)
-
+    import ipdb; ipdb.set_trace()
     # Variables
-    SAMPLE_RATE = 44100
+    SAMPLE_RATE = 16000
 
     # Class name -> Class index
-    with open('class_to_index.json') as f:
+    with open('class_to_index _AE.json') as f:
         class_to_index = json.load(f)
 
-    AUDIO_DIR = '/idiap/temp/ibmahmoud/evolang/animal_data/Meerkat_sound_files_examples_segments/'
+    AUDIO_DIR = '/idiap/temp/ibmahmoud/evolang/AudioEventDataset/'
 
     # Dataset
-    data = NCCRMeerkatsDataset(
+    data = AEDataset(
         audio_dir=AUDIO_DIR,
         class_to_index=class_to_index,
         target_sample_rate=SAMPLE_RATE,
+        train=False
         )
 
     # Dataloader

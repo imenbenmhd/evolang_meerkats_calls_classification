@@ -10,6 +10,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, ConcatDataset
 from torch.utils.data import random_split
 from pytorch_lightning.loggers import WandbLogger
+
 import numpy
 from sklearn.model_selection import KFold
 from src.utils import utils
@@ -18,15 +19,17 @@ from src.models.hannahcnn import HannahCNN
 from src.models.cnn_16khz_seg import CNN_16KHz_Seg
 from src.models.cnn_16khz_subseg import CNN_16KHz_Subseg
 from src.models.Palazcnn import PalazCNN
+
 from src.data.nccrmeerkatsdataset import NCCRMeerkatsDataset
+from src.data.acousticeventsdataset import AEDataset
 
 
-from transformers import Wav2Vec2FeatureExtractor
+#from transformers import Wav2Vec2FeatureExtractor
 
 # Wanb
 
 # Map
-with open('src/data/class_to_index.json') as f:
+with open('src/data/class_to_index_AE_7.json') as f:
     class_to_index = json.load(f)
 
 
@@ -55,7 +58,7 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name= "kfold_novalset",project="meerkats-subseg")
+wandb_logger = WandbLogger(name= "AE7_kfoldTrue",project="meerkats-subseg")
 
 EPOCHS = 100
 kfold=True
@@ -63,44 +66,40 @@ kfold=True
 if __name__ == "__main__":
     # Data
     args=arg_parser()
-    data_test = NCCRMeerkatsDataset(
+    data_test = AEDataset(
             audio_dir=args.input_dir,
             class_to_index=class_to_index,
             target_sample_rate=args.sampling_rate,
-            train=False,transform=False
+            train=False
             ) 
    
     
-    data_train=NCCRMeerkatsDataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True,transform=False)
-    num_classes = len(set(class_to_index.values()))
-    print(f'There are {len(data_test)} data points in the test set and {num_classes} classes.')
-    print(f'There are {len(data_train)} data points in the train set and {num_classes} classes.')
-    
-   
-   
+    data_train=AEDataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True)
 
+    num_classes = len(set(class_to_index.values()))
+   
     
-    train_list=data_train._construct_filelist_dataframe()
-    effectif=(train_list.class_index.value_counts()).sort_index()
-    weights=torch.tensor(max(effectif) / effectif, dtype=torch.float32)
-    # Split
-    val_size = int(0.4 * len(data_test))
+    
+    #effectif=(train_list.class_index.value_counts()).sort_index()
+    #weights=torch.tensor(max(effectif) / effectif, dtype=torch.float32)
+    # Split Val and test
+    val_size = int(0.6* len(data_test))
     test_size = len(data_test) - val_size
     seed = torch.Generator().manual_seed(42)
     val_dataset, test_dataset = torch.utils.data.random_split(data_test, [val_size, test_size], generator=seed)
     if kfold==False:
+        print(f'There are {len(data_test)} data points in the test set and {num_classes} classes.')
+        print(f'There are {len(data_train)} data points in the train set and {num_classes} classes.')
         train_loader = DataLoader(data_train, batch_size=args.batch_size,collate_fn=utils.collate_fn,num_workers=4)
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size,collate_fn=utils.collate_fn,num_workers=4)
         test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, collate_fn=utils.collate_fn,num_workers=4)
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
         #effectif=(filelist.class_index.value_counts()).sort_index()
-        #weights=torch.tensor(max(effectif) / effectif, dtype=torch.float32)
+        #weights=torch.tensor(max(#effectif) / effectif, dtype=torch.float32)
         es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
 
         trainer = pl.Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[es])
         
-        model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing,weight=weights)
+        model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing)
 
         trainer.tune(model,train_dataloaders=train_loader)
         trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)
@@ -108,23 +107,21 @@ if __name__ == "__main__":
 
         trainer.test(model, ckpt_path='best', dataloaders=test_loader)
 
-  
-
     else:
     # k-folds
         k_folds=5
         kfold=KFold(n_splits=k_folds,shuffle=True)
         dataset=ConcatDataset([data_train,val_dataset])
-        
         for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset)):
             print(f'Fold {fold}')
             num_train = len(train_ids)
             indices = list(range(num_train))
             split = int(numpy.floor(0.2* num_train))
-
- 
-
+            numpy.random.shuffle(indices)
             train_idx, valid_idx = indices[split:], indices[:split]
+            print(f'There are {len(test_ids)} data points in the test set and {num_classes} classes.')
+            print(f'There are {len(train_idx)} data points in the train set and {num_classes} classes.')
+            print(f'There are {len(valid_idx)} data points in the validation set and {num_classes} classes.')
 
             train_subsampler=torch.utils.data.SubsetRandomSampler(train_idx)
             val_subsampler=torch.utils.data.SubsetRandomSampler(valid_idx)
@@ -136,13 +133,12 @@ if __name__ == "__main__":
             test_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=test_subsampler, shuffle=False, collate_fn=utils.collate_fn,num_workers=4)
 
     
-            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # Instantiate model
             es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
 
             trainer = pl.Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[es])
                 
-            model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing,weight=weights)
+            model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing)
 
             trainer.tune(model,train_dataloaders=train_loader)
             trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)

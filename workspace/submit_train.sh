@@ -1,1 +1,1 @@
-jman -vv submit -q sgpu -n train_zff /idiap/temp/esarkar/miniconda/envs/pytorch_vad/bin/python /idiap/temp/ibmahmoud/evolang/evolang_meerkats_calls_classification/workspace/train_lit.py -dir /idiap/temp/ibmahmoud/evolang/animal_data/Meerkat_sound_files_examples_segments_/ -s 16000 -b 16 -lr 1e-3
+jman -vv submit -q sgpu -n train_zff /idiap/temp/esarkar/miniconda/envs/pytorch_vad/bin/python /idiap/temp/ibmahmoud/evolang/evolang_meerkats_calls_classification/workspace/train_lit.py -dir /idiap/temp/ibmahmoud/evolang/AudioEventDataset_7/ -s 16000 -b 16 -lr 1e-3

@@ -55,7 +55,7 @@ class Lit(pl.LightningModule):
         preds,y=self.common_step(batch,batch_idx)
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        loss = nn.CrossEntropyLoss(weight=self.weight.to(device))
+        loss = nn.CrossEntropyLoss() #weight=self.weight.to(device))
         train_loss=loss(preds,y)
         train_acc = accuracy(preds, y)
 
@@ -64,7 +64,7 @@ class Lit(pl.LightningModule):
         return train_loss
 
     def validation_step(self, batch, batch_idx):
-
+        
         preds,y=self.common_step(batch,batch_idx)
        
        
@@ -109,7 +109,7 @@ class Lit(pl.LightningModule):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         acc=self.unbalanced_accuracy(conf_matrix)
-        recal=Recall(num_classes=9).to(device)
+        recal=Recall(num_classes=7).to(device)
         recall=recal(pred,targ).to(device)
         self.log("unbalanced accuracy", acc[0])
         self.log("Recall",recall)
@@ -121,11 +121,11 @@ class Lit(pl.LightningModule):
 
         accuracy=torch.diagonal(matrix) / torch.sum(matrix,dim=1)
         print(accuracy)
-        accuracy=torch.sum(accuracy)/9
+        accuracy=torch.sum(accuracy)/7
         return accuracy.to(device),
 
     def predict_step(self,batch,batch_idx):
-        x,y=batch
+        x,y=batchs
         logits=self.model(x)
         proba=nn.functional.softmax(logits,dim=1)
         return proba,y
@@ -139,7 +139,7 @@ class Lit(pl.LightningModule):
             pred=torch.argmax(i,dim=1)
             predictions= torch.cat((predictions, pred), 0)
             targets=torch.cat((targets,x),0)
-        confmat = ConfusionMatrix(num_classes=9).to(device)
+        confmat = ConfusionMatrix(num_classes=7).to(device)
         targets=targets.type(torch.int64)
         predictions=predictions.type(torch.int64)
         matrix=confmat(predictions, targets)

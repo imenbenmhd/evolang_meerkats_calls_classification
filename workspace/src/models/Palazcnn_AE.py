@@ -7,7 +7,7 @@ class PalazCNN(nn.Module):
     # Based on the paper: Towards End-to-end speech recognition
     # PDF: http://publications.idiap.ch/downloads/papers/2019/Muckenhirn_INTERSPEECH_2019.pdf
     
-    def __init__(self, n_input=1, n_output=9, n_channel=40,flatten_size=1):
+    def __init__(self, n_input=1, n_output=9, n_channel=40,flatten_size=4):
         super().__init__()
 
         # Block 1
@@ -16,12 +16,12 @@ class PalazCNN(nn.Module):
         self.relu1 = nn.ReLU()
         
         # Block 2
-        self.conv2 = nn.Conv1d(n_channel, n_channel, kernel_size=7, stride=1)
+        self.conv2 = nn.Conv1d(n_channel,2*n_channel, kernel_size=7, stride=7)
         self.pool2 = nn.MaxPool1d(kernel_size=2, stride=2)
         self.relu2 = nn.ReLU()
         
         # Block 3
-        self.conv3 = nn.Conv1d(n_channel, 2*n_channel, kernel_size=3, stride=1)
+        self.conv3 = nn.Conv1d(2*n_channel, 2*n_channel, kernel_size=7, stride=1)
         self.pool3 = nn.MaxPool1d(kernel_size=2, stride=2)
         self.relu3 = nn.ReLU()
         self.adapt=nn.AdaptiveAvgPool1d(flatten_size) # arbitrary
