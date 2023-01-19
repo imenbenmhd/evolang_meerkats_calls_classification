@@ -9,7 +9,7 @@ import torch.optim as optim
 import torch.nn as nn
 from torchmetrics import Accuracy
 from sklearn.metrics import confusion_matrix
-from model import linearmodel
+from src.models.linear_model import linearmodel
 from sklearn.model_selection import train_test_split
 
 import random
@@ -23,9 +23,9 @@ import torchmetrics
 
 if __name__ == "__main__": 
     dev=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    df=pd.read_csv("/idiap/temp/ibmahmoud/evolang/evolang_meerkats_calls_classification/workspace/features_extraction/eGeMAPSv02_functionals.csv")
+    df=pd.read_csv("/idiap/temp/ibmahmoud/evolang/evolang_meerkats_calls_classification/workspace/features_extraction/last_layer_features_nonoise.csv")
     target=df.iloc[:,len(df.columns)-1]
-    features=df.iloc[:,1:len(df.columns)-1]
+    features=df.iloc[:,:len(df.columns)-1]
 
     train_size=int(len(features)*0.8)
     test_size=len(features)-train_size
@@ -64,7 +64,7 @@ if __name__ == "__main__":
             optimizer.step()
         #print(f'epoch', epoch,"total loss", total_loss)
         train_pred=model(X_train)
-        accuracy=Accuracy()
+        accuracy=Accuracy().to(dev)
         total_acc=accuracy(train_pred,y_train)
         print(f'epoch', epoch,"total acc", total_acc)
 

@@ -15,7 +15,7 @@ import pandas as pd
 import json 
 import os
 class Lit(pl.LightningModule):
-    def __init__(self,model,learning_rate,fold=None,weight=None,framing=False):
+    def __init__(self,model,learning_rate,num_classes,fold=None,weight=None,framing=False):
         super().__init__()
 
        # self.model = PalazCNN(n_input=1,n_output=9,flatten_size=1)
@@ -25,6 +25,7 @@ class Lit(pl.LightningModule):
         self.weight=weight
         self.frame=framing
         self.learning_rate=learning_rate
+        self.num_classes=num_classes
         self.save_hyperparameters()
 
 
@@ -109,9 +110,9 @@ class Lit(pl.LightningModule):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         acc=self.unbalanced_accuracy(conf_matrix)
-        recal=Recall(num_classes=7).to(device)
+        recal=Recall(num_classes=self.num_classes).to(device)
         recall=recal(pred,targ).to(device)
-        self.log("unbalanced accuracy", acc[0])
+        self.log("unbalanced accuracy", acc.item())
         self.log("Recall",recall)
 
         print(conf_matrix)
@@ -121,11 +122,11 @@ class Lit(pl.LightningModule):
 
         accuracy=torch.diagonal(matrix) / torch.sum(matrix,dim=1)
         print(accuracy)
-        accuracy=torch.sum(accuracy)/7
-        return accuracy.to(device),
+        accuracy=torch.sum(accuracy)/self.num_classes
+        return accuracy.to(device)
 
     def predict_step(self,batch,batch_idx):
-        x,y=batchs
+        x,y=batch
         logits=self.model(x)
         proba=nn.functional.softmax(logits,dim=1)
         return proba,y
@@ -139,7 +140,7 @@ class Lit(pl.LightningModule):
             pred=torch.argmax(i,dim=1)
             predictions= torch.cat((predictions, pred), 0)
             targets=torch.cat((targets,x),0)
-        confmat = ConfusionMatrix(num_classes=7).to(device)
+        confmat = ConfusionMatrix(num_classes=self.num_classes).to(device)
         targets=targets.type(torch.int64)
         predictions=predictions.type(torch.int64)
         matrix=confmat(predictions, targets)

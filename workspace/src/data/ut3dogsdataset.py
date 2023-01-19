@@ -14,20 +14,19 @@ import json
 import glob
 import os
 
-class NCCRMeerkatsDataset(Dataset):
+class UT3dogsdataset(Dataset):
     def __init__(self,
                 audio_dir=None,
                 class_to_index=None,
                 target_sample_rate=None,
-                train=False,
-                transform=False
+                train=False
                 ):
         
         self.audio_dir = audio_dir
         self.class_to_index=class_to_index
         self.target_sample_rate=target_sample_rate
         self.train=train
-        self.transform=transform
+        
 
         self.filelist = self._construct_filelist_dataframe()
 
@@ -45,9 +44,7 @@ class NCCRMeerkatsDataset(Dataset):
         signal = self._mix_down_if_necessary(signal)     # Mono-channel
 
         # Return
-        if self.transform:
-            signal=self.transform(signal)
-
+        
 
         return signal, label
 
@@ -62,9 +59,9 @@ class NCCRMeerkatsDataset(Dataset):
        
        
         # Make dataframe
-        filelist['segment_name'] = filelist.path.apply(lambda x: x.split('/')[-1])
-        filelist['file_name'] = filelist.path.apply(lambda x: x.split('/')[-2])
-        filelist['class_name'] = filelist.path.apply(lambda x: x.split('/')[-3])
+        filelist['file_name'] = filelist.path.apply(lambda x: x.split('/')[-1])
+        filelist['class_name'] = filelist.path.apply(lambda x: x.split('/')[-2])
+        filelist=filelist.loc[filelist["class_name"] !="S"]
         filelist['class_index'] = filelist.class_name.apply(lambda x: self.class_to_index[x])
 
 
@@ -77,38 +74,6 @@ class NCCRMeerkatsDataset(Dataset):
             #if self.transform:
              #   train_list=self._augmented_construct_filelist_dataframe(train_list)
             return train_list
-        
-        
-    def _augmented_construct_filelist_dataframe(self,filelist):
-
-        tempdir="/idiap/temp/ibmahmoud/evolang/tmp/"
-
-        augmented_list=filelist.copy()
-        effectif=(filelist.class_index.value_counts()).sort_index()
-        weights=torch.tensor(max(effectif) / effectif, dtype=torch.float32) # start by adding for the 2 smallest one
-        values, index= torch.topk(weights,2)
-        to_augment=filelist[filelist['class_index']==index[0]]
-        for i in index[1:]:
-            to_augment=pd.concat([to_augment,filelist[filelist['class_index']==i.item()]]) # these are the file that we will augment
-        files_toaugment=to_augment['path'].tolist()
-        speed_factor = [0.75,0.85,0.95, 0.8]
-        for ind,file in enumerate(files_toaugment):
-            for s in speed_factor:
-                path_=change_speed_save(file,s,self.target_sample_rate,tempdir)
-            
-            
-            
-                row={'path': os.path.join(path_,file.split('/')[-1][:-4]+str(s)+".wav"), 'segment_name': file.split('/')[-1][:-4]+str(s)+".wav", 'file_name': file.split('/')[-2],'class_name': file.split('/')[-3],'class_index':self.class_to_index[file.split('/')[-3]]}
-                new_df = pd.DataFrame([row])
-                augmented_list = pd.concat([augmented_list, new_df], axis=0, ignore_index=True)
-            #for d in db:   # adding a background noise decrease the validation accuracy too much
-            #    path__=background_noise_save(d,file,tempdir)
-             #   row={'path': os.path.join(path__,file.split('/')[-1][:-4]+str(d)+".wav"), 'segment_name': file.split('/')[-1][:-4]+str(d)+".wav", 'file_name': file.split('/')[-2],'class_name': file.split('/')[-3],'class_index':self.class_to_index[file.split('/')[-3]]}
-              #  new_df = pd.DataFrame([row])
-                #augmented_list = pd.concat([augmented_list, new_df], axis=0, ignore_index=True)
-
-
-        return augmented_list
 
 
     def _resample_if_necessary(self, signal, sr):
@@ -133,10 +98,10 @@ def pad_sequence(batch):
     # Make all tensor in a batch the same length by padding with zeros
     #batch = [item.t() for item in batch] if batch is in 3D
     #batch= [item.permute(1,0,2) for item in batch]
-    batch = [item.permute(1,0,2) for item in batch]
-    print(batch.size())
+    batch = [item.t() for item in batch]
+
     batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=0.)
-    return batch.permute(0, 2, 1,3)
+    return batch.permute(0, 2, 1)
 
 
 def collate_fn(batch):
@@ -153,38 +118,7 @@ def collate_fn(batch):
     return tensors, targets
 
 
-def change_speed_save(file,speed_factor,sample_rate=44100,dir=None):
-    audio, sr= torchaudio.load(file)
 
-
-    sox_effects = [
-        ["speed", str(speed_factor)],
-        ["rate", str(sample_rate)],
-        ]
-    transformed_audio, _ = torchaudio.sox_effects.apply_effects_tensor(
-                audio, sr, sox_effects)
-    new_path=os.path.join(dir,file.split('/')[-2])
-    if not os.path.exists(new_path):
-        os.mkdir(new_path)
-    torchaudio.save(os.path.join(new_path,file.split('/')[-1][:-4]+str(speed_factor)+".wav"), transformed_audio, sr)
-
-    return new_path
- 
-def background_noise_save(db,file,dir=None):
-    speech,sr= torchaudio.load(file)
-    noise, _=torchaudio.load(os.path.join("/idiap/temp/ibmahmoud/evolang/tmp/noise","train.wav"))
-    noise= noise[:,:speech.shape[1]]
-
-    speech_rms= speech.norm(p=2)
-    noise_rms=noise.norm(p=2)
-    snr= 10** (db/20)
-    scale= snr*noise_rms / speech_rms
-    noisy_speech = (scale*speech +noise)/2
-    new_path=os.path.join(dir,file.split('/')[-2])
-    if not os.path.exists(new_path):
-        os.mkdir(new_path)
-    torchaudio.save(os.path.join(new_path,file.split('/')[-1][:-4]+str(db)+".wav"), noisy_speech, sr)
-    return new_path
 
 
 

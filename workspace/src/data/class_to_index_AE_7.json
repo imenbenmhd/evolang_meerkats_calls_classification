@@ -2,8 +2,8 @@
     "bird"                               : 0,
     "cat"                       	 : 1,
     "dog_barking"              	         : 2,
-    "acoustic_guitar"			 : 3,
-    "airplane"				 : 4,
-    "applause"				 : 5,
-    "glass_breaking"			 : 6
+    "child"			 : 3,
+    "laughter"				 : 4,
+    "scream"				 : 5,
+    "speech_fs"			 : 6
 }

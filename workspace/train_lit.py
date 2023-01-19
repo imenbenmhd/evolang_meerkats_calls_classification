@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, ConcatDataset
 from torch.utils.data import random_split
 from pytorch_lightning.loggers import WandbLogger
-
+from torchaudio import transforms
 import numpy
 from sklearn.model_selection import KFold
 from src.utils import utils
@@ -21,6 +21,8 @@ from src.models.cnn_16khz_subseg import CNN_16KHz_Subseg
 from src.models.Palazcnn import PalazCNN
 
 from src.data.nccrmeerkatsdataset import NCCRMeerkatsDataset
+from src.data.mfcc import mfccMeerkatsDataset
+from src.data.ut3dogsdataset import UT3dogsdataset
 from src.data.acousticeventsdataset import AEDataset
 
 
@@ -29,7 +31,7 @@ from src.data.acousticeventsdataset import AEDataset
 # Wanb
 
 # Map
-with open('src/data/class_to_index_AE_7.json') as f:
+with open('src/data/class_to_index_UT3.json') as f:
     class_to_index = json.load(f)
 
 
@@ -58,7 +60,7 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name= "AE7_kfoldTrue",project="meerkats-subseg")
+wandb_logger = WandbLogger(name= "UT3-kfoldtrue",project="dogs")
 
 EPOCHS = 100
 kfold=True
@@ -66,7 +68,8 @@ kfold=True
 if __name__ == "__main__":
     # Data
     args=arg_parser()
-    data_test = AEDataset(
+    #transform = transforms.MFCC(sample_rate=args.sampling_rate, n_mfcc=40,melkwargs={"n_fft": 400, "hop_length": int(args.sampling_rate*0.002), "win_length": int(args.sampling_rate*0.005)})
+    data_test =UT3dogsdataset (
             audio_dir=args.input_dir,
             class_to_index=class_to_index,
             target_sample_rate=args.sampling_rate,
@@ -74,7 +77,7 @@ if __name__ == "__main__":
             ) 
    
     
-    data_train=AEDataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True)
+    data_train=UT3dogsdataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True)
 
     num_classes = len(set(class_to_index.values()))
    
@@ -90,16 +93,17 @@ if __name__ == "__main__":
     if kfold==False:
         print(f'There are {len(data_test)} data points in the test set and {num_classes} classes.')
         print(f'There are {len(data_train)} data points in the train set and {num_classes} classes.')
-        train_loader = DataLoader(data_train, batch_size=args.batch_size,collate_fn=utils.collate_fn,num_workers=4)
-        val_loader = DataLoader(val_dataset, batch_size=args.batch_size,collate_fn=utils.collate_fn,num_workers=4)
-        test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, collate_fn=utils.collate_fn,num_workers=4)
+        train_loader = DataLoader(data_train, batch_size=args.batch_size,num_workers=4)
+        val_loader = DataLoader(val_dataset, batch_size=args.batch_size,num_workers=4)
+        test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,num_workers=4)
         #effectif=(filelist.class_index.value_counts()).sort_index()
         #weights=torch.tensor(max(#effectif) / effectif, dtype=torch.float32)
         es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
 
-        trainer = pl.Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[es])
+        trainer = pl.Trainer(accelerator='cpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[es])
         
-        model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing)
+        #model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing)
+        model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing) # if using mfcc to classify
 
         trainer.tune(model,train_dataloaders=train_loader)
         trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)
@@ -128,9 +132,9 @@ if __name__ == "__main__":
             test_subsampler=torch.utils.data.SubsetRandomSampler(test_ids)
 
     # Dataloader in this fold
-            train_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=train_subsampler, collate_fn=utils.collate_fn,num_workers=4)
-            val_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=val_subsampler, collate_fn=utils.collate_fn,num_workers=4)
-            test_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=test_subsampler, shuffle=False, collate_fn=utils.collate_fn,num_workers=4)
+            train_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=train_subsampler,collate_fn=utils.collate_fn, num_workers=4)
+            val_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=val_subsampler,collate_fn=utils.collate_fn, num_workers=4)
+            test_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=test_subsampler, shuffle=False,collate_fn=utils.collate_fn, num_workers=4)
 
     
     # Instantiate model
@@ -138,7 +142,7 @@ if __name__ == "__main__":
 
             trainer = pl.Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[es])
                 
-            model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing)
+            model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,num_classes=num_classes,framing=args.framing)
 
             trainer.tune(model,train_dataloaders=train_loader)
             trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)

@@ -18,9 +18,9 @@ if __name__== "__main__":
     #data=pd.read_csv("/idiap/temp/ibmahmoud/evolang/Meerkats_project/eGeMAPSv02.csv").drop('name',axis=1)
     #target=data['class']
     #features=data.drop('class',axis=1)
-    df=pd.read_csv("./features_extraction/eGeMAPSv02_functionals.csv")
+    df=pd.read_csv("./features_extraction/last_layer_features_nonoise.csv")
     target=df.iloc[:,len(df.columns)-1]
-    features=df.iloc[:,1:len(df.columns)-1]
+    features=df.iloc[:,:len(df.columns)-1]
 
     
     train_size=int(len(features)*0.8)
