@@ -65,7 +65,7 @@ class UT3dogsdataset(Dataset):
         filelist['class_index'] = filelist.class_name.apply(lambda x: self.class_to_index[x])
 
 
-        train_list,test_list=train_test_split(filelist,test_size=0.3,random_state=42)
+        train_list,test_list=train_test_split(filelist,test_size=0.2,random_state=42)
         if self.train == False:
             return test_list
         if self.train: 

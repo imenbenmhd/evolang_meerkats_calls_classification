@@ -20,7 +20,7 @@ class NCCRMeerkatsDataset(Dataset):
                 class_to_index=None,
                 target_sample_rate=None,
                 train=False,
-                transform=False
+                transform=None
                 ):
         
         self.audio_dir = audio_dir
@@ -43,10 +43,10 @@ class NCCRMeerkatsDataset(Dataset):
         # Preprocess (if necessary)
         signal = self._resample_if_necessary(signal, sr) # Downsample
         signal = self._mix_down_if_necessary(signal)     # Mono-channel
+        signal = self._transform_if_necessary(signal)  # Transformation
 
         # Return
-        if self.transform:
-            signal=self.transform(signal)
+        
 
 
         return signal, label
@@ -127,6 +127,12 @@ class NCCRMeerkatsDataset(Dataset):
 
     def _get_audio_sample_label(self, index, signal):
         return self.filelist.class_index.iloc[index]
+    
+    def _transform_if_necessary(self, signal):
+
+        if self.transform:
+                signal = self.transform(signal)
+                return signal
 
 
 def pad_sequence(batch):

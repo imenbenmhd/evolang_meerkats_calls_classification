@@ -32,7 +32,7 @@ class Lit(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-        #optimizer = torch.optim.SGD(self.parameters(), lr=self.learning_rate, momentum=0.9)
+       # optimizer = torch.optim.SGD(self.parameters(), lr=self.learning_rate, momentum=0.9)
         #optimizer=torch.optim.RMSprop(self.parameters(), lr=self.learning_rate)
         return optimizer
     

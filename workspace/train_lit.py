@@ -20,6 +20,9 @@ from src.models.cnn_16khz_seg import CNN_16KHz_Seg
 from src.models.cnn_16khz_subseg import CNN_16KHz_Subseg
 from src.models.Palazcnn import PalazCNN
 
+
+from src.utils.logmelfilterbankspectrum import LogMelFilterBankSpectrum
+
 from src.data.nccrmeerkatsdataset import NCCRMeerkatsDataset
 from src.data.mfcc import mfccMeerkatsDataset
 from src.data.ut3dogsdataset import UT3dogsdataset
@@ -31,7 +34,7 @@ from src.data.acousticeventsdataset import AEDataset
 # Wanb
 
 # Map
-with open('src/data/class_to_index_UT3.json') as f:
+with open('src/data/class_to_index.json') as f:
     class_to_index = json.load(f)
 
 
@@ -60,24 +63,31 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name= "UT3-kfoldtrue",project="dogs")
+wandb_logger = WandbLogger(name= "",project="dogs")
 
 EPOCHS = 100
 kfold=True
 
+
+
 if __name__ == "__main__":
     # Data
     args=arg_parser()
+    FRAME_LENGTH = 25 * args.sampling_rate // 1000
+    HOP_LENGTH = 10 * args.sampling_rate // 1000
+    transform = None
+
     #transform = transforms.MFCC(sample_rate=args.sampling_rate, n_mfcc=40,melkwargs={"n_fft": 400, "hop_length": int(args.sampling_rate*0.002), "win_length": int(args.sampling_rate*0.005)})
-    data_test =UT3dogsdataset (
+    data_test =NCCRMeerkatsDataset (
             audio_dir=args.input_dir,
             class_to_index=class_to_index,
             target_sample_rate=args.sampling_rate,
-            train=False
+            train=False, transform=LogMelFilterBankSpectrum(frame_length=FRAME_LENGTH, hop_length=HOP_LENGTH)
             ) 
    
     
-    data_train=UT3dogsdataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True)
+    data_train=NCCRMeerkatsDataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True,
+        transform= LogMelFilterBankSpectrum(frame_length=FRAME_LENGTH, hop_length=HOP_LENGTH))
 
     num_classes = len(set(class_to_index.values()))
    
@@ -86,7 +96,7 @@ if __name__ == "__main__":
     #effectif=(train_list.class_index.value_counts()).sort_index()
     #weights=torch.tensor(max(effectif) / effectif, dtype=torch.float32)
     # Split Val and test
-    val_size = int(0.6* len(data_test))
+    val_size = int(0.4* len(data_test))
     test_size = len(data_test) - val_size
     seed = torch.Generator().manual_seed(42)
     val_dataset, test_dataset = torch.utils.data.random_split(data_test, [val_size, test_size], generator=seed)
@@ -115,7 +125,7 @@ if __name__ == "__main__":
     # k-folds
         k_folds=5
         kfold=KFold(n_splits=k_folds,shuffle=True)
-        dataset=ConcatDataset([data_train,val_dataset])
+        dataset=ConcatDataset([data_train,data_test])
         for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset)):
             print(f'Fold {fold}')
             num_train = len(train_ids)

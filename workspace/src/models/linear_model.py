@@ -9,12 +9,13 @@ class linearmodel(nn.Module):
         super().__init__()
         self.layer=nn.Sequential(nn.Flatten(),nn.Linear(feat_dim,128))
         self.layer2=nn.Sequential(
-                    nn.LayerNorm(128),nn.ReLU(),nn.Linear(128,64),nn.LayerNorm(64),nn.ReLU(),nn.Linear(64,32),nn.ReLU(),nn.Linear(32,n_output))
+                    nn.LayerNorm(128),nn.ReLU(),nn.Linear(128,64),
+                    nn.LayerNorm(64),nn.ReLU(),nn.Linear(64,32),nn.ReLU(),nn.Linear(32,n_output))
     
 
     def forward(self,x):
-        firstlay=self.layer(x)
-        output=self.layer2(firstlay)
+        x=self.layer(x)
+        x=self.layer2(x)
 
         return output
 

@@ -91,7 +91,6 @@ if __name__ == "__main__":
     accuracy=torch.diagonal(matrix) / torch.sum(matrix,dim=1)
     print(accuracy)
 
-    print(torch.sum(accuracy)/9)
 
     print(matrix)
 
