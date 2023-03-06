@@ -5,3 +5,4 @@
 **/__pycache__
 **/lightning_logs
 /workspace/meerkats-subseg
+**/data
