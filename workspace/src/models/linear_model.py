@@ -17,5 +17,5 @@ class linearmodel(nn.Module):
         x=self.layer(x)
         x=self.layer2(x)
 
-        return output
+        return x
 

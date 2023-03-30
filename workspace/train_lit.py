@@ -1,5 +1,4 @@
 import argparse
-from email import parser
 import json
 from tokenize import group
 import wandb
@@ -15,6 +14,8 @@ import numpy
 from sklearn.model_selection import KFold
 from src.utils import utils
 from src.models.lit import Lit
+
+from src.models.linear_model import linearmodel
 from src.models.hannahcnn import HannahCNN
 from src.models.cnn_16khz_seg import CNN_16KHz_Seg
 from src.models.cnn_16khz_subseg import CNN_16KHz_Subseg
@@ -22,6 +23,7 @@ from src.models.Palazcnn import PalazCNN
 
 
 from src.utils.logmelfilterbankspectrum import LogMelFilterBankSpectrum
+from src.utils.featuresExtractor import featuresextraction
 
 from src.data.nccrmeerkatsdataset import NCCRMeerkatsDataset
 from src.data.mfcc import mfccMeerkatsDataset
@@ -30,7 +32,7 @@ from src.data.acousticeventsdataset import AEDataset
 from src.data.isabelmeerkatdataset import isabelMerkatDataset
 
 
-#from transformers import Wav2Vec2FeatureExtractor
+from transformers import Wav2Vec2Model
 
 # Wanb
 
@@ -64,7 +66,7 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name="RMS-lr1e-4",project="Isabel_meerkat")
+wandb_logger = WandbLogger(name="RMS-lr1e-3-Kernel120",project="Isabel_meerkat")
 
 EPOCHS = 100
 kfold=True
@@ -76,22 +78,18 @@ if __name__ == "__main__":
     args=arg_parser()
     FRAME_LENGTH = 25 * args.sampling_rate // 1000
     HOP_LENGTH = 10 * args.sampling_rate // 1000
-    transform = None
-
     #transform = transforms.MFCC(sample_rate=args.sampling_rate, n_mfcc=40,melkwargs={"n_fft": 400, "hop_length": int(args.sampling_rate*0.002), "win_length": int(args.sampling_rate*0.005)})
+    #transform=featuresextraction(upstream="wavlm", layer=5)
+    transform=None
     data_test =isabelMerkatDataset (
             audio_dir=args.input_dir,
             class_to_index=class_to_index,
             target_sample_rate=args.sampling_rate,
-            train=False)
-    #transform=LogMelFilterBankSpectrum(frame_length=FRAME_LENGTH, hop_length=HOP_LENGTH)
-            
-   
-    data_train=isabelMerkatDataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True)
+            train=False,transform=transform)
+    data_train=isabelMerkatDataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True,transform=transform)
     #,  transform= LogMelFilterBankSpectrum(frame_length=FRAME_LENGTH, hop_length=HOP_LENGTH))
 
     num_classes = len(set(class_to_index.values()))
-   
     
     
     #effectif=(train_list.class_index.value_counts()).sort_index()
@@ -113,9 +111,8 @@ if __name__ == "__main__":
         es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
 
         trainer = pl.Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[es])
-        
         #model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing)
-        model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing) # if using mfcc to classify
+        model = Lit(linearmodel(pretrained.config.hidden_size,num_classes),args.learning_rate,framing=args.framing,pretrained_model=pretrained,layer=0) # if using mfcc to classify
 
         trainer.tune(model,train_dataloaders=train_loader)
         trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)
@@ -152,10 +149,10 @@ if __name__ == "__main__":
 
     # Instantiate model
             es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
-
             trainer = pl.Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[es])
-                
-            model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,num_classes=num_classes,framing=args.framing)
+            #pretrained=Wav2Vec2Model.from_pretrained('facebook/wav2vec2-base-960h')
+
+            model = Lit(PalazCNN(n_output=num_classes),args.learning_rate,num_classes=num_classes,framing=args.framing,pretrained_model=None)
 
             trainer.tune(model,train_dataloaders=train_loader)
             trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)
