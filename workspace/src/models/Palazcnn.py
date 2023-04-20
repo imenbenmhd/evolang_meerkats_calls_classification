@@ -7,7 +7,7 @@ class PalazCNN(nn.Module):
     # Based on the paper: Towards End-to-end speech recognition
     # PDF: http://publications.idiap.ch/downloads/papers/2019/Muckenhirn_INTERSPEECH_2019.pdf
     
-    def __init__(self, n_input=1, n_output=9, n_channel=120,flatten_size=1):
+    def __init__(self, n_input=1, n_output=9, n_channel=40,flatten_size=1):
         super().__init__()
 
         # Block 1
@@ -60,7 +60,6 @@ class PalazCNN(nn.Module):
         #x=self.adapt(x)
         #x=self.flatten(x)
         #x = self.fc1(x)
-        
         return x
     
     

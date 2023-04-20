@@ -70,8 +70,9 @@ class NCCRMeerkatsDataset(Dataset):
 
         train_list,test_list=train_test_split(filelist,test_size=0.3,random_state=42)
         if self.train == False:
-            return test_list
+            return filelist
         if self.train: 
+            return train_list,test_list
         
             
             #if self.transform:
@@ -131,8 +132,10 @@ class NCCRMeerkatsDataset(Dataset):
     def _transform_if_necessary(self, signal):
 
         if self.transform:
-                signal = self.transform(signal)
-                return signal
+
+            signal = self.transform(signal)
+            signal=signal.unsqueeze(0)
+        return signal
 
 
 def pad_sequence(batch):

@@ -13,7 +13,7 @@ from src.utils import utils
 
 if __name__=="__main__":
     device=torch.device('cpu')
-    path_="/idiap/temp/ibmahmoud/evolang/Meerkats_project/evolang.meerkats.call_type_classification/"
+    path_="/idiap/temevolang/Meerkats_project/evolang.meerkats.call_type_classification/"
     lit=Lit(model=PalazCNN(n_input=1,n_output=9),learning_rate=1e-3)
 
    # model=lit.load_from_checkpoint(path_+"/meerkats-subseg/3oovaz0i/checkpoints/epoch=99-step=8400.ckpt") #best model

@@ -1,0 +1,1 @@
+jman -vv submit -q sgpu -n wavlm /idiap/temp/ibmahmoud/miniconda3/envs/s3prl-pytorch/bin/python /idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/workspace/train_lit.py -dir /idiap/project/evolang/meerkats_imen/dataset/Meerkat_sound_files_examples_segments -s 16000 -b 16 -lr 1e-3
