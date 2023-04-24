@@ -40,8 +40,9 @@ class featuresextraction(object):
         length=len(sample)
 
         with torch.no_grad():
-
+            print(sample.unsqueeze(0).size())
             hs,hs_len=model(sample.unsqueeze(0),torch.tensor(len(sample)).unsqueeze(0))
+            print(len(hs),hs[0].size())
             #hs,hs_len=model(sample.unsqueeze(0),torch.tensor(len(sample)).unsqueeze(0))
             #features=model.extract_features(sample.unsqueeze(0), offset=0.0, duration=None, trim=False, use_grad=False, layer=-1)
         

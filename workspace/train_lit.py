@@ -43,7 +43,7 @@ warnings.filterwarnings("ignore")
 # Wanb
 
 # Map
-with open('src/data/class_to_index_isabel.json') as f:
+with open('src/data/class_to_index_mara.json') as f:
     class_to_index = json.load(f)
 
 
@@ -68,15 +68,18 @@ def arg_parser():
         help='To frame the segment into 100ms frames or not')
 
 
-        parser.add_argument('-lr','--learning_rate',type=float,help="the learning rate to use")
+        parser.add_argument('-lr','--learning_rate',type=float,help="the learning rate to use",default=None)
+        parser.add_argument('-m','--model',default=None)
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name="adam-wavlm-pretrained-lre-3-lastlayer",project="Isabel_meerkat")
-EPOCHS = 20
+wandb_logger = WandbLogger(name="adamlr0.003-mergeAggr",project="mara_meerkat")
+EPOCHS = 100
 kfold=True
 
-s3prl_dimensions={"wavlm" : 768, "hubert" : 768, "NPC"}
+s3prl_dimensions={"wavlm" : 768, "hubert" : 768, "apc" : 512, "mockingjay" : 768, "npc" : 512, "wav2vec2": 768}
+
+learning_rates=[0.0001,0.0002,0.0003,0.0004,0.0006,0.0008,0.001,0.0015,0.003,0.005]
 
 
 if __name__ == "__main__":
@@ -84,9 +87,11 @@ if __name__ == "__main__":
     args=arg_parser()
     FRAME_LENGTH = 25 * args.sampling_rate // 1000
     HOP_LENGTH = 10 * args.sampling_rate // 1000
-    #transform = transforms.MFCC(sample_rate=args.sampling_rate, n_mfcc=40,melkwargs={"n_fft": 400, "hop_length": int(args.sampling_rate*0.002), "win_length": int(args.sampling_rate*0.005)})
-    transform=featuresextraction(upstream="wavlm", layer=5)
-    #transform=None
+    
+    if args.model == None:
+         transform=None
+    else:
+        transform=featuresextraction(upstream=args.model, layer=5)
     dataset =isabelMerkatDataset(
             audio_dir=args.input_dir,
             class_to_index=class_to_index,
@@ -133,54 +138,66 @@ if __name__ == "__main__":
         result={}
         k_folds=5
         kfold=StratifiedKFold(n_splits=k_folds,shuffle=True,random_state=42)
-        accuracies_folds=[]
-        for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset,dataset.filelist.class_index)):
-            
-            print(f'Fold {fold}')
+        if args.learning_rate is not None:
+             learning_rates=[args.learning_rate]
+        for lr in learning_rates:
+                accuracies_folds=[]
 
-        #     num_train = len(train_ids)
-        #     indices = list(range(num_train))
-        #     split = int(numpy.floor(0.2* num_train))
-        #     numpy.random.shuffle(indices)
-        #     train_idx, valid_idx = indices[split:], indices[:split]
-            mask=dataset.filelist.index.isin(train_ids)
-            dataset_=dataset.filelist[mask] 
-            all_ids=numpy.arange(0,len(dataset))
-            for k, (train_idx, valid_idx) in enumerate(kfold.split(dataset_,dataset_.class_index)):
-                 train_ids=train_idx
-                 break
-            all_ids=numpy.arange(0,len(dataset))
-            keep_mask=numpy.isin(all_ids,test_ids,invert=True)
-            new_ids=all_ids[keep_mask]
-            train_ids=new_ids[train_ids]
-            valid_idx=new_ids[valid_idx]
-            print(f'There are {len(test_ids)} data points in the test set and {num_classes} classes.')
-            print(f'There are {len(train_ids)} data points in the train set and {num_classes} classes.')
-            print(f'There are {len(valid_idx)} data points in the validation set and {num_classes} classes.')
-            train_subsampler=torch.utils.data.SubsetRandomSampler(train_idx)
-            val_subsampler=torch.utils.data.SubsetRandomSampler(valid_idx)
-            test_subsampler=torch.utils.data.SubsetRandomSampler(test_ids)
+                for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset,dataset.filelist.class_index)):
+                
+                        print(f'Fold {fold}')
 
-    # Dataloader in this fold
-            train_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=train_subsampler,collate_fn=utils.collate_fn, num_workers=4)
-            val_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=val_subsampler,collate_fn=utils.collate_fn, num_workers=4)
-            test_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=test_subsampler, shuffle=False,collate_fn=utils.collate_fn, num_workers=4)
+                        #     num_train = len(train_ids)
+                        #     indices = list(range(num_train))
+                        #     split = int(numpy.floor(0.2* num_train))
+                        #     numpy.random.shuffle(indices)
+                        #     train_idx, valid_idx = indices[split:], indices[:split]
+                        mask=dataset.filelist.index.isin(train_ids)
+                        dataset_=dataset.filelist[mask] 
+                        all_ids=numpy.arange(0,len(dataset))
+                        for k, (train_idx, valid_idx) in enumerate(kfold.split(dataset_,dataset_.class_index)):
+                                train_ids=train_idx
+                                break
+                        all_ids=numpy.arange(0,len(dataset))
+                        keep_mask=numpy.isin(all_ids,test_ids,invert=True)
+                        new_ids=all_ids[keep_mask]
+                        train_ids=new_ids[train_ids]
+                        valid_idx=new_ids[valid_idx]
+                        print(f'There are {len(test_ids)} data points in the test set and {num_classes} classes.')
+                        print(f'There are {len(train_ids)} data points in the train set and {num_classes} classes.')
+                        print(f'There are {len(valid_idx)} data points in the validation set and {num_classes} classes.')
+                        train_subsampler=torch.utils.data.SubsetRandomSampler(train_idx)
+                        val_subsampler=torch.utils.data.SubsetRandomSampler(valid_idx)
+                        test_subsampler=torch.utils.data.SubsetRandomSampler(test_ids)
+
+                # Dataloader in this fold
+                        train_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=train_subsampler,collate_fn=utils.collate_fn, num_workers=4)
+                        val_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=val_subsampler,collate_fn=utils.collate_fn, num_workers=4)
+                        test_loader = DataLoader(dataset, batch_size=args.batch_size,sampler=test_subsampler, shuffle=False,collate_fn=utils.collate_fn, num_workers=4)
 
 
-    # Instantiate model
-            es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
-            trainer = Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=75, enable_progress_bar=True)
-            #pretrained=Wav2Vec2Model.from_pretrained('facebook/wav2vec2-base-960h')
+                # Instantiate model
+                        es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
+                        trainer = Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=75, enable_progress_bar=True)
+                        #pretrained=Wav2Vec2Model.from_pretrained('facebook/wav2vec2-base-960h')
+                        if transform is not None:
+                                model = Lit(linearmodel(s3prl_dimensions[args.model],num_classes),lr,num_classes=num_classes,framing=args.framing,pretrained_model=None)
+                        else:
+                                model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),lr,num_classes=num_classes,framing=args.framing)
 
-            model = Lit(linearmodel(768,num_classes),args.learning_rate,num_classes=num_classes,framing=args.framing,pretrained_model=None)
+                        trainer.tune(model,train_dataloaders=train_loader)
+                        trainer.fit(model, train_dataloaders=train_loader,val_dataloaders=val_loader)
+                        trainer.validate(model, ckpt_path='best', dataloaders=val_loader)
 
-            trainer.tune(model,train_dataloaders=train_loader)
-            trainer.fit(model, train_dataloaders=train_loader,val_dataloaders=val_loader)
-            trainer.validate(model, ckpt_path='best', dataloaders=val_loader)
+                        accur=trainer.test(model, ckpt_path='best', dataloaders=test_loader)
+                        accuracies_folds.append(accur[-1]["unbalanced accuracy"])
+                result[lr]=accuracies_folds
+    # with open("results_ADAM_sansfixingweight.pkl","wb") as fp:
+    #     pickle.dump(result,fp)
+    # print("dict saved",result)
+        
 
-            accur=trainer.test(model, ckpt_path='best', dataloaders=test_loader)
-            accuracies_folds.append(accur[-1]["unbalanced accuracy"])
-        with open('adam-wavlm-pretrained-lre-3-lastlayer_RESULT-Isabel.pkl', 'wb') as f:
-                pickle.dump(accuracies_folds, f)
+        with open('adam-0.003-mergeaggressionclass.pkl', 'wb') as f:
+                pickle.dump(result, f)
         torch.cuda.empty_cache()
         

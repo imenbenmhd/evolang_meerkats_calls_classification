@@ -68,7 +68,7 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name="ADAM-pretrained-mara-on-marta-without-fixingweights",project="marta_meerkat")
+#wandb_logger = WandbLogger(name="ADAM-pretrained-mara-on-marta-without-fixingweights",project="marta_meerkat")
 EPOCHS = 100
 kfold=True
 
@@ -111,7 +111,7 @@ if __name__ == "__main__":
         accuracies_folds=[]
         accuracies_folds_marta=[]
         for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset,dataset.filelist.class_index)):
-            
+            import ipdb; ipdb.set_trace();
             print(f'Fold {fold}')
 
             #     num_train = len(train_ids)
@@ -168,8 +168,8 @@ if __name__ == "__main__":
             accuracies_folds_marta.append(acc_marta[-1]["unbalanced accuracy"])
     #if lr not in result:
         result[lr]={"mara" : accuracies_folds,"marta": accuracies_folds_marta}
-    with open("results_ADAM_sansfixingweight.pkl","wb") as fp:
-        pickle.dump(result,fp)
-    print("dict saved",result)
+    # with open("results_ADAM_sansfixingweight.pkl","wb") as fp:
+    #     pickle.dump(result,fp)
+    # print("dict saved",result)
         
             
