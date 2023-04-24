@@ -13,6 +13,7 @@ from pytorch_lightning.loggers import WandbLogger
 from torchaudio import transforms
 import numpy
 from sklearn.model_selection import StratifiedKFold
+import pandas as pd
 from sklearn.model_selection import KFold
 import pickle
 from src.utils import utils
@@ -43,7 +44,7 @@ warnings.filterwarnings("ignore")
 # Wanb
 
 # Map
-with open('src/data/class_to_index_mara.json') as f:
+with open('src/data/class_to_index_marta1.json') as f:
     class_to_index = json.load(f)
 
 
@@ -73,7 +74,7 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name="adamlr0.003-mergeAggr",project="mara_meerkat")
+wandb_logger = WandbLogger(name="addedtrainval_stratify",project="marta_meerkat")
 EPOCHS = 100
 kfold=True
 
@@ -92,11 +93,16 @@ if __name__ == "__main__":
          transform=None
     else:
         transform=featuresextraction(upstream=args.model, layer=5)
-    dataset =isabelMerkatDataset(
+    dataset_test=isabelMerkatDataset(
             audio_dir=args.input_dir,
             class_to_index=class_to_index,
             target_sample_rate=args.sampling_rate,
-            train=False,transform=transform)
+            train=False)
+    dataset_train=isabelMerkatDataset(
+            audio_dir=args.input_dir,
+            class_to_index=class_to_index,
+            target_sample_rate=args.sampling_rate,
+            train=True)
     
     
     #data_train=isabelMerkatDataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True,transform=transform)
@@ -137,36 +143,42 @@ if __name__ == "__main__":
     # k-folds
         result={}
         k_folds=5
+        dataset=torch.utils.data.ConcatDataset([dataset_test,dataset_train])
+        labels=dataset.datasets[0].filelist.class_index.tolist()+ dataset.datasets[1].filelist.class_index.tolist()
+                
         kfold=StratifiedKFold(n_splits=k_folds,shuffle=True,random_state=42)
         if args.learning_rate is not None:
              learning_rates=[args.learning_rate]
         for lr in learning_rates:
                 accuracies_folds=[]
 
-                for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset,dataset.filelist.class_index)):
+                for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset,labels)):
                 
                         print(f'Fold {fold}')
+                        x=pd.concat((dataset.datasets[0].filelist,dataset.datasets[1].filelist))
+                        # num_train = len(train_ids)
+                        # indices = list(range(num_train))
+                        # split = int(numpy.floor(0.2* num_train))
+                        # numpy.random.shuffle(indices)
+                        # train_idx, valid_idx = indices[split:], indices[:split]
 
-                        #     num_train = len(train_ids)
-                        #     indices = list(range(num_train))
-                        #     split = int(numpy.floor(0.2* num_train))
-                        #     numpy.random.shuffle(indices)
-                        #     train_idx, valid_idx = indices[split:], indices[:split]
-                        mask=dataset.filelist.index.isin(train_ids)
-                        dataset_=dataset.filelist[mask] 
-                        all_ids=numpy.arange(0,len(dataset))
+                        # mask=dataset.filelist.index.isin(train_ids)
+                        # dataset_=dataset.filelist[mask] 
+                        # all_ids=numpy.arange(0,len(dataset))
+                        mask=x.index.isin(train_ids)
+                        dataset_=x[mask]
                         for k, (train_idx, valid_idx) in enumerate(kfold.split(dataset_,dataset_.class_index)):
                                 train_ids=train_idx
                                 break
                         all_ids=numpy.arange(0,len(dataset))
-                        keep_mask=numpy.isin(all_ids,test_ids,invert=True)
-                        new_ids=all_ids[keep_mask]
-                        train_ids=new_ids[train_ids]
-                        valid_idx=new_ids[valid_idx]
+                        # keep_mask=numpy.isin(all_ids,test_ids,invert=True)
+                        # new_ids=all_ids[keep_mask]
+                        # train_ids=new_ids[train_ids]
+                        # valid_idx=new_ids[valid_idx]
                         print(f'There are {len(test_ids)} data points in the test set and {num_classes} classes.')
                         print(f'There are {len(train_ids)} data points in the train set and {num_classes} classes.')
                         print(f'There are {len(valid_idx)} data points in the validation set and {num_classes} classes.')
-                        train_subsampler=torch.utils.data.SubsetRandomSampler(train_idx)
+                        train_subsampler=torch.utils.data.SubsetRandomSampler(train_ids)
                         val_subsampler=torch.utils.data.SubsetRandomSampler(valid_idx)
                         test_subsampler=torch.utils.data.SubsetRandomSampler(test_ids)
 
@@ -197,7 +209,7 @@ if __name__ == "__main__":
     # print("dict saved",result)
         
 
-        with open('adam-0.003-mergeaggressionclass.pkl', 'wb') as f:
+        with open('adam-0.0015-addedstratify-train-val.pkl', 'wb') as f:
                 pickle.dump(result, f)
         torch.cuda.empty_cache()
         

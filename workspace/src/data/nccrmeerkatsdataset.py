@@ -70,14 +70,13 @@ class NCCRMeerkatsDataset(Dataset):
 
         train_list,test_list=train_test_split(filelist,test_size=0.3,random_state=42)
         if self.train == False:
-            return filelist
+            return test_list
         if self.train: 
-            return train_list,test_list
+            return train_list
         
             
             #if self.transform:
              #   train_list=self._augmented_construct_filelist_dataframe(train_list)
-            return train_list
         
         
     def _augmented_construct_filelist_dataframe(self,filelist):
