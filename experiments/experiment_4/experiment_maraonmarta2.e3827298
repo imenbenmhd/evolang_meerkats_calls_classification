@@ -1,0 +1,200 @@
+2023-05-03 12:03:39,598 INFO gridtk: Starting job 95: /idiap/temp/esarkar/miniconda/envs/pytorch_vad/bin/python /idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/workspace/pretrainMara-marta.py -dir /idiap/project/evolang/meerkats_imen/dataset/Meerkat_sound_files_examples_segments/info_file.csv -s 16000 -b 16 -lr 0.003
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: libtorch_cuda_cu.so: cannot open shared object file: No such file or directory
+  warn(f"Failed to load image Python extension: {e}")
+wandb: Currently logged in as: imenbm. Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.15.1 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.13.4
+wandb: Run data is saved locally in ./wandb/run-20230503_120419-5lox00by
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run pretrained-mara-on-marta-fixed-weight
+wandb: ⭐️ View project at https://wandb.ai/imenbm/marta_meerkat
+wandb: 🚀 View run at https://wandb.ai/imenbm/marta_meerkat/runs/5lox00by
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.3 K
+-----------------------------------
+729       Trainable params
+22.6 K    Non-trainable params
+23.3 K    Total params
+0.093     Total estimated model params size (MB)
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py:1892: PossibleUserWarning: The number of training batches (72) is smaller than the logging interval Trainer(log_every_n_steps=75). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+  rank_zero_warn(
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200.ckpt
+Restoring states from the checkpoint path at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./marta_meerkat/5lox00by/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.3 K
+-----------------------------------
+729       Trainable params
+22.6 K    Non-trainable params
+23.3 K    Total params
+0.093     Total estimated model params size (MB)
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py:1892: PossibleUserWarning: The number of training batches (72) is smaller than the logging interval Trainer(log_every_n_steps=75). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+  rank_zero_warn(
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v1.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v1.ckpt
+Restoring states from the checkpoint path at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v1.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v1.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./marta_meerkat/5lox00by/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.3 K
+-----------------------------------
+729       Trainable params
+22.6 K    Non-trainable params
+23.3 K    Total params
+0.093     Total estimated model params size (MB)
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py:1892: PossibleUserWarning: The number of training batches (72) is smaller than the logging interval Trainer(log_every_n_steps=75). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+  rank_zero_warn(
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v2.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v2.ckpt
+Restoring states from the checkpoint path at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v2.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v2.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./marta_meerkat/5lox00by/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.3 K
+-----------------------------------
+729       Trainable params
+22.6 K    Non-trainable params
+23.3 K    Total params
+0.093     Total estimated model params size (MB)
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py:1892: PossibleUserWarning: The number of training batches (72) is smaller than the logging interval Trainer(log_every_n_steps=75). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+  rank_zero_warn(
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v3.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v3.ckpt
+Restoring states from the checkpoint path at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v3.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v3.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./marta_meerkat/5lox00by/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.3 K
+-----------------------------------
+729       Trainable params
+22.6 K    Non-trainable params
+23.3 K    Total params
+0.093     Total estimated model params size (MB)
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py:1892: PossibleUserWarning: The number of training batches (72) is smaller than the logging interval Trainer(log_every_n_steps=75). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+  rank_zero_warn(
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v4.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v4.ckpt
+Restoring states from the checkpoint path at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v4.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./marta_meerkat/5lox00by/checkpoints/epoch=99-step=7200-v4.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+wandb: Waiting for W&B process to finish... (success).
+wandb: - 0.001 MB of 0.001 MB uploaded (0.000 MB deduped)wandb: \ 0.001 MB of 0.006 MB uploaded (0.000 MB deduped)wandb: | 0.062 MB of 0.062 MB uploaded (0.000 MB deduped)wandb: 
+wandb: Run history:
+wandb:               epoch ▁▂▃▄▅▆▇▇▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█
+wandb:      test_acc_epoch ▂▇▃▅▂█▁█▁█
+wandb:       test_acc_step ▄▄▄▄▇▇██▆▂▇▃▇▆▄▆▂▃▅▅▇█▇▇▃▃▃▁█▇▇█▅▅▃▅█▇▇▆
+wandb:     test_loss_epoch ▇▄▇▇█▃▇▁█▁
+wandb:      test_loss_step ▃▂▅▂▁▁▁▁▂▂▂▃▁▂▄▁▅▅▄▂█▁▁▁▃▃▃▃▁▂▂▁▃▃▃▂▁▁▂▃
+wandb:     train_acc_epoch ▁▅▆▆▆▇▇█▁▄▆▆▇▇▇▇▁▅▆▆▇▇▇█▃▄▆▇▇▇██▃▅▇▇▇█▇█
+wandb:      train_acc_step ▂▆▆▁▆█▅▇▃▅▆▇█▅▆▅▅▅▃▅▆▅▇▅▃▃▆▂▇▆▆▆▆▃▃▅█▇▅█
+wandb:    train_loss_epoch █▅▃▂▂▂▂▁▇▄▃▃▁▂▂▂█▄▃▂▂▂▂▁▅▅▃▂▂▂▂▁▅▃▂▂▂▁▂▁
+wandb:     train_loss_step ▄▄▃█▂▂▂▂▄▄▄▃▁▅▃▃▄▄▄▄▃▄▃▄▄▄▄▅▃▂▃▂▃▄▄▄▃▃▄▃
+wandb: trainer/global_step ▁▁▂▂▆▂▃▃▁▃▂▂▂▂█▃▁▁▂▅▂▂▃▃▂▁▂▂▂▇▃▃▁▁▄▂▂▃▃▁
+wandb: unbalanced accuracy ▂▆▃▄▂▇▁█▁▇
+wandb:       val_acc_epoch ▃▄▅▄▆▃▆▇▁▆▆▇▅▆█▇▅▄▇▆▅▆▇▇▅▆▆▇▇▆██▅▆▅▇▇▆▇▇
+wandb:        val_acc_step ▄▄▃▆▃▅▄▇▆▇▃▃▆▃▇▄▁▂▃▂▇▇▅▇▄▆▄▁█▄▅▄▄▄▂▇▆▅▆▄
+wandb:      val_loss_epoch █▇▄▄▄▇▃▃▇▄▂▄▃▄▂▂▃▂▂▂▁▁▁▁▄▂▂▂▄▄▂▂▆▅▅▅▇▅▅▆
+wandb:       val_loss_step ▂▃▂▂▃▄▂▂▂▂▂▃▂▂▁▂▄▃▂▂▂▂▂▁▂▂▂▄▁▂▂▃▂█▂▂▂▂▁▃
+wandb: 
+wandb: Run summary:
+wandb:               epoch 0
+wandb:      test_acc_epoch 0.96657
+wandb:       test_acc_step 0.85714
+wandb:     test_loss_epoch 0.15435
+wandb:      test_loss_step 0.84779
+wandb:     train_acc_epoch 0.7859
+wandb:      train_acc_step 0.92308
+wandb:    train_loss_epoch 0.59899
+wandb:     train_loss_step 0.50117
+wandb: trainer/global_step 0
+wandb: unbalanced accuracy 0.90674
+wandb:       val_acc_epoch 0.75261
+wandb:        val_acc_step 0.73333
+wandb:      val_loss_epoch 1.25437
+wandb:       val_loss_step 1.04239
+wandb: 
+wandb: Synced pretrained-mara-on-marta-fixed-weight: https://wandb.ai/imenbm/marta_meerkat/runs/5lox00by
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20230503_120419-5lox00by/logs
+2023-05-03 12:21:04,835 INFO gridtk: Job 95 finished with result 0

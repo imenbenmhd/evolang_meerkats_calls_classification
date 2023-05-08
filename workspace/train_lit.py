@@ -18,6 +18,7 @@ from sklearn.model_selection import KFold
 import pickle
 from src.utils import utils
 from src.models.lit import Lit
+import random
 
 from src.models.linear_model import linearmodel
 from src.models.hannahcnn import HannahCNN
@@ -44,7 +45,7 @@ warnings.filterwarnings("ignore")
 # Wanb
 
 # Map
-with open('src/data/class_to_index_marta1.json') as f:
+with open('/idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/workspace/src/data/class_to_index_isabel.json') as f:
     class_to_index = json.load(f)
 
 
@@ -74,7 +75,7 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name="addedtrainval_stratify",project="marta_meerkat")
+wandb_logger = WandbLogger(name="test_1_RMS",project="Isabel_meerkat")
 EPOCHS = 100
 kfold=True
 
@@ -82,7 +83,7 @@ s3prl_dimensions={"wavlm" : 768, "hubert" : 768, "apc" : 512, "mockingjay" : 768
 
 learning_rates=[0.0001,0.0002,0.0003,0.0004,0.0006,0.0008,0.001,0.0015,0.003,0.005]
 
-
+random.seed(42)
 if __name__ == "__main__":
     # Data
     args=arg_parser()
@@ -93,11 +94,12 @@ if __name__ == "__main__":
          transform=None
     else:
         transform=featuresextraction(upstream=args.model, layer=5)
+        
     dataset_test=isabelMerkatDataset(
-            audio_dir=args.input_dir,
-            class_to_index=class_to_index,
-            target_sample_rate=args.sampling_rate,
-            train=False)
+             audio_dir=args.input_dir,
+             class_to_index=class_to_index,
+             target_sample_rate=args.sampling_rate,
+             train=False)
     dataset_train=isabelMerkatDataset(
             audio_dir=args.input_dir,
             class_to_index=class_to_index,
@@ -129,7 +131,7 @@ if __name__ == "__main__":
         #effectif=(filelist.class_index.value_counts()).sort_index()
         #weights=torch.tensor(max(#effectif) / effectif, dtype=torch.float32)
         es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
-        trainer = pl.Trainer(accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[es])
+        trainer = pl.Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=25, enable_progress_bar=True,callbacks=[es])
         #model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),args.learning_rate,framing=args.framing)
         model = Lit(linearmodel(728,num_classes),args.learning_rate,framing=args.framing,pretrained_model=None) # if using mfcc to classify
 
@@ -145,40 +147,40 @@ if __name__ == "__main__":
         k_folds=5
         dataset=torch.utils.data.ConcatDataset([dataset_test,dataset_train])
         labels=dataset.datasets[0].filelist.class_index.tolist()+ dataset.datasets[1].filelist.class_index.tolist()
-                
-        kfold=StratifiedKFold(n_splits=k_folds,shuffle=True,random_state=42)
+        #kfold=StratifiedKFold(n_splits=k_folds,shuffle=True,random_state=42)
+        kfold=KFold(n_splits=5)
         if args.learning_rate is not None:
              learning_rates=[args.learning_rate]
         for lr in learning_rates:
                 accuracies_folds=[]
 
-                for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset,labels)):
+                for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset)):
                 
                         print(f'Fold {fold}')
-                        x=pd.concat((dataset.datasets[0].filelist,dataset.datasets[1].filelist))
-                        # num_train = len(train_ids)
-                        # indices = list(range(num_train))
-                        # split = int(numpy.floor(0.2* num_train))
-                        # numpy.random.shuffle(indices)
-                        # train_idx, valid_idx = indices[split:], indices[:split]
+                        #x=pd.concat((dataset.datasets[0].filelist,dataset.datasets[1].filelist))
+                        num_train = len(train_ids)
+                        #indices = list(range(num_train))
+                        split = int(numpy.floor(0.2* num_train))
+                        #numpy.random.shuffle(indices)
+                        train_idx, valid_idx = train_ids[split:], train_ids[:split]
 
                         # mask=dataset.filelist.index.isin(train_ids)
                         # dataset_=dataset.filelist[mask] 
                         # all_ids=numpy.arange(0,len(dataset))
-                        mask=x.index.isin(train_ids)
-                        dataset_=x[mask]
-                        for k, (train_idx, valid_idx) in enumerate(kfold.split(dataset_,dataset_.class_index)):
-                                train_ids=train_idx
-                                break
-                        all_ids=numpy.arange(0,len(dataset))
+                        # mask=x.index.isin(train_ids)
+                        # dataset_=x[mask]
+                        # for k, (train_idx, valid_idx) in enumerate(kfold.split(dataset_,dataset_.class_index)):
+                        #         train_ids=train_idx
+                        #         break
+                        # all_ids=numpy.arange(0,len(dataset))
                         # keep_mask=numpy.isin(all_ids,test_ids,invert=True)
                         # new_ids=all_ids[keep_mask]
                         # train_ids=new_ids[train_ids]
                         # valid_idx=new_ids[valid_idx]
                         print(f'There are {len(test_ids)} data points in the test set and {num_classes} classes.')
-                        print(f'There are {len(train_ids)} data points in the train set and {num_classes} classes.')
+                        print(f'There are {len(train_idx)} data points in the train set and {num_classes} classes.')
                         print(f'There are {len(valid_idx)} data points in the validation set and {num_classes} classes.')
-                        train_subsampler=torch.utils.data.SubsetRandomSampler(train_ids)
+                        train_subsampler=torch.utils.data.SubsetRandomSampler(train_idx)
                         val_subsampler=torch.utils.data.SubsetRandomSampler(valid_idx)
                         test_subsampler=torch.utils.data.SubsetRandomSampler(test_ids)
 
@@ -204,12 +206,10 @@ if __name__ == "__main__":
                         accur=trainer.test(model, ckpt_path='best', dataloaders=test_loader)
                         accuracies_folds.append(accur[-1]["unbalanced accuracy"])
                 result[lr]=accuracies_folds
-    # with open("results_ADAM_sansfixingweight.pkl","wb") as fp:
-    #     pickle.dump(result,fp)
-    # print("dict saved",result)
+   
         
 
-        with open('adam-0.0015-addedstratify-train-val.pkl', 'wb') as f:
+        with open('test_isabelRMS.pkl', 'wb') as f:
                 pickle.dump(result, f)
         torch.cuda.empty_cache()
         
