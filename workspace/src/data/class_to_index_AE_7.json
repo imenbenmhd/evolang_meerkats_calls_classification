@@ -1,9 +1,0 @@
-{
-    "bird"                               : 0,
-    "cat"                       	 : 1,
-    "dog_barking"              	         : 2,
-    "child"			 : 3,
-    "laughter"				 : 4,
-    "scream"				 : 5,
-    "speech_fs"			 : 6
-}

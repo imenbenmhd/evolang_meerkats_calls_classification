@@ -1,0 +1,394 @@
+2023-05-09 14:45:17,142 INFO gridtk: Starting job 46: /idiap/temp/esarkar/miniconda/envs/pytorch_vad/bin/python /idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/workspace/pretrainMara-marta.py -dir /idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/lib/mara-code/audio/info_file.csv -s 16000 -b 16 -lr 0.003
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: libtorch_cuda_cu.so: cannot open shared object file: No such file or directory
+  warn(f"Failed to load image Python extension: {e}")
+wandb: Currently logged in as: imenbm. Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.15.2 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.13.4
+wandb: Run data is saved locally in ./wandb/run-20230509_144602-1zr8feo6
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run ADAM-pretrained-marta-on-mara-withoutfixingweights
+wandb: ⭐️ View project at https://wandb.ai/imenbm/mara_meerkat
+wandb: 🚀 View run at https://wandb.ai/imenbm/mara_meerkat/runs/1zr8feo6
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v1.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v1.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v1.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v1.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v2.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v2.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v2.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v2.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v3.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v3.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v3.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v3.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v4.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v4.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v4.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v4.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v5.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v5.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v5.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v5.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v6.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v6.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v6.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v6.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v7.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v7.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v7.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v7.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v8.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v8.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v8.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v8.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v9.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v9.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v9.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v9.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v10.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v10.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v10.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v10.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v11.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v11.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v11.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v11.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
+`Trainer.fit` stopped: `max_epochs=100` reached.
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v12.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v12.ckpt
+Restoring states from the checkpoint path at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v12.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Loaded model weights from checkpoint at ./mara_meerkat/1zr8feo6/checkpoints/epoch=99-step=25800-v12.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/idiap/temp/esarkar/miniconda/envs/pytorch_vad/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:616: UserWarning: Checkpoint directory ./mara_meerkat/1zr8feo6/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name  | Type     | Params
+-----------------------------------
+0 | model | PalazCNN | 23.1 K
+-----------------------------------
+23.1 K    Trainable params
+0         Non-trainable params
+23.1 K    Total params
+0.093     Total estimated model params size (MB)
