@@ -15,9 +15,16 @@ from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 from sklearn.model_selection import KFold
 import pickle
+
+import sys
+
 from src.utils import utils
 from src.models.lit import Lit
 
+
+import sys
+sys.path.append('../')
+from meerkats import config
 from src.models.linear_model import linearmodel
 
 
