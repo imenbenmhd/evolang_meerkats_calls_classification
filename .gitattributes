@@ -1,6 +1,9 @@
 *.o* filter=lfs diff=lfs merge=lfs -text
 experiments/experiment_7/marta_onmara_notfiedweights.o3830656 filter=lfs diff=lfs merge=lfs -text
 meerkats/src/features_extraction/Compare2016.csv filter=lfs diff=lfs merge=lfs -text
+*.LightingData.asset filter=lfs diff=lfs merge=lfs -text
+experiments/experiment_6/marta_onmara_fixedweights.o3830657 filter=lfs diff=lfs merge=lfs -text
+workspace/results/marta-data/log-finallrsearch-adam.o3821837 filter=lfs diff=lfs merge=lfs -text
 *.csv filter=lfs diff=lfs merge=lfs -text
 *.o3821837 filter=lfs diff=lfs merge=lfs -text
 *.o3830657 filter=lfs diff=lfs merge=lfs -text
