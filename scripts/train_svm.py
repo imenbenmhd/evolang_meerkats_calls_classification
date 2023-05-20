@@ -1,74 +1,149 @@
 from doctest import master
+import argparse
 import pandas as pd
 import os
 import sys
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
-import cupy as xp
-sys.path.insert(1, '../lib/svmgpu/')
-from svm import SVM
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 from sklearn.metrics import ConfusionMatrixDisplay
+from sklearn.metrics import make_scorer
 import matplotlib.pyplot as plt
 
-def svm(): 
+from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import GridSearchCV
+from sklearn import metrics
+from sklearn import svm
+import json
+import cupy as xp
+import pickle
+from sklearn import preprocessing
 
-    #data=pd.read_csv("/idiap/temp/ibmahmoud/evolang/Meerkats_project/eGeMAPSv02.csv").drop('name',axis=1)
-    #target=data['class']
-    #features=data.drop('class',axis=1)
-    df=pd.read_csv("./features_extraction/last_layer_features_nonoise.csv")
-    target=df.iloc[:,len(df.columns)-1]
-    features=df.iloc[:,:len(df.columns)-1]
+def get_argument_parser():
+
+    parser = argparse.ArgumentParser(
+        description="Extract the features from the pre-trained model"
+    )
+
+    parser.add_argument(
+        "-m",
+        "--model",
+        help=
+        "to chose between svm or random forest",
+    )
+    parser.add_argument(
+    "-p",
+     "--path",
+     help=
+     "the .csv file that containes the features and the label, created by extract_feats_segment"
+    )
+    parser.add_argument("-n","--name",help="the name of the features extracted")
+    parser.add_argument("-d","--expdir",help="the directory to download the results")
+
+    return parser
+
+
+
+
+
+
+
+parser = get_argument_parser()
+args = parser.parse_args()
+
+def setup_directories(args):
+
+    if args.expdir is None:
+        args.expdir = f"result/{args.model}"
+    else:
+        args.expdir = f"{args.expdir}/{args.model}"
+
+    os.makedirs(args.expdir, exist_ok=True)
+
+
+
+def svm_class(args,X_train,y_train):
+    uar_=make_scorer(uar,greater_is_better=True)
+    param_grid = {'C': [0.1,1, 10, 100], 'gamma': [1,0.1,0.01,0.001],'kernel': ['linear','rbf', 'poly', 'sigmoid'],'decision_function_shape': ['ovo']}
+    X_train = preprocessing.scale(X_train)
+    grid=GridSearchCV(svm.SVC(),param_grid,scoring=uar_,refit=True,cv=5,verbose=2)
+    grid.fit(X_train,y_train)
+
+    return grid
+
+def rf_class(args,X_train,y_train):
+
+    param_grid = {
+    "n_estimators": [10,20,30,40,50, 70,80, 100, 150, 200],
+    "max_depth": [None, 5, 7 , 10],
+    "min_samples_split": [2, 3,5, 7,10],
+    "min_samples_leaf": [1, 2, 3,4]
+}
+
+      
+    uar_=make_scorer(uar,greater_is_better=True)
+
+    rf=RandomForestClassifier(random_state=42)
+    grid= GridSearchCV(estimator=rf, param_grid=param_grid,scoring=uar_, cv=5, n_jobs=-1)
+    grid.fit(X_train, y_train)
+
+    return grid
+
 
     
-    train_size=int(len(features)*0.8)
-    test_size=len(features)-train_size
-
-    X_train, X_test, y_train, y_test= train_test_split(features.values,target.values,test_size=test_size,random_state=42)
-    X_train=xp.asarray(X_train)
-    X_test=xp.asarray(X_test)
-    y_train=xp.asarray(y_train)
-    y_test=xp.asarray(y_test)
-    svm=SVM(kernel='linear',kernel_params={'sigma': 15 },classification_strategy='ovr',x=X_train,y=y_train,n_folds=3,use_optimal_lambda=True)
-    svm.fit(X_train,y_train)
-    prediction=svm.predict(X_test)
-    matrix=confusion_matrix(xp.asnumpy(y_test),xp.asnumpy(prediction))
-    print(matrix)
-    missclass=svm.compute_misclassification_error(X_test,y_test)
-
     
 
-    print(missclass)
+def uar(X,Y):
+
+    confusion_m=metrics.confusion_matrix(X,Y)
+
+    av_uar=np.sum(np.diag(confusion_m) / np.sum(confusion_m,axis=1))/confusion_m.shape[0]
+
+    return av_uar
 
 
-def RF():
-    df=pd.read_csv("./features_extraction/last_layer_features_nonoise.csv")
-    target=df.iloc[:,len(df.columns)-1]
-    features=df.iloc[:,1:len(df.columns)-1]
+
+if __name__=="__main__":
+    features=pd.read_csv(args.path,header=None,index_col=0)
+
+    target=features.iloc[:,-1]
+    features=features.iloc[:,:-1]
+
+    X_train, X_test, y_train, y_test= train_test_split(features.values,target.values,test_size=0.2,random_state=42)
+
+    if args.model=="svm":
+        grid=svm_class(args,X_train,y_train)
+        X_test= preprocessing.scale(X_test)
+
+        y_pred=grid.predict(X_test)
+    else:
+        grid=rf_class(args,X_train,y_train)
+
+
+        
+        y_pred=grid.predict(X_test)
+
+    confusion_m=metrics.confusion_matrix(y_test,y_pred)
+    uar= np.diag(confusion_m) / np.sum(confusion_m,axis=1)
+
+    av_uar=np.sum(np.diag(confusion_m) / np.sum(confusion_m,axis=1))/confusion_m.shape[0]
+    result={"confusion matrix": confusion_m, "uar": uar, "av_uar": av_uar, "param": grid.best_params_}
+    with open(args.model + args.name + "result_mara.pkl", "wb") as handle:
+        pickle.dump(result, handle)
+
+
+
+
+
+
+
+
+
+
 
     
-    train_size=int(len(features)*0.8)
-    test_size=len(features)-train_size
-
-    X_train, X_test, y_train, y_test= train_test_split(features.values,target.values,test_size=test_size,random_state=42)
-    rf_model = RandomForestClassifier(n_estimators=50, max_features="auto", random_state=42)
-    rf=rf_model.fit(X_train, y_train)
-    print("training over")
-
-    disp=ConfusionMatrixDisplay.from_estimator(rf,X_test,y_test,cmap=plt.cm.Blues)
-    print(disp.confusion_matrix)
-    plt.show()
-    predictions = rf_model.predict(X_test)
-    matrix_= confusion_matrix(y_test,predictions)
-    print(matrix_)
-    print(np.diag(matrix_)/np.sum(matrix_,axis=1))
-    print(rf_model.feature_importances_)
-
-
-if __name__== "__main__":
-    RF()
 
 
 

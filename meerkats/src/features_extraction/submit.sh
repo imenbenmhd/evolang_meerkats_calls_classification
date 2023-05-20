@@ -1,0 +1,2 @@
+
+jman -vv submit -n mapmare -q q1d /idiap/temp/esarkar/miniconda/envs/pytorch_vad/bin/python /idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/meerkats/src/features_extraction/extract_feats_segments.py -n egemaps -d /idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/data/info_file_mara.csv -i /idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/src/data/class_to_index_mara.json -p features/

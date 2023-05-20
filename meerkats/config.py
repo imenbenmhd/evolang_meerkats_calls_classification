@@ -4,8 +4,8 @@ import os
 
 configDir =os.path.abspath(os.path.dirname(__file__))
 
-#GITROOT=os.path.join(configDir + "../")
-GITROOT="/idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification"
+GITROOT=os.path.join(configDir + "/..")
+#GITROOT="/idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification"
 
 
 DATADIR= GITROOT + "/data/"

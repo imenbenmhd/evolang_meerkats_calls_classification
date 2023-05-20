@@ -16,32 +16,29 @@ from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 from sklearn.model_selection import KFold
 import pickle
-from src.utils import utils
-from src.models.lit import Lit
+import sys
+sys.path.append('../')
+
+from meerkats.src.utils import utils
+from meerkats.src.models.lit import Lit
 import random
 
-from src.models.linear_model import linearmodel
-from src.models.hannahcnn import HannahCNN
-from src.models.cnn_16khz_seg import CNN_16KHz_Seg
-from src.models.cnn_16khz_subseg import CNN_16KHz_Subseg
-from src.models.Palazcnn import PalazCNN
+from meerkats.src.models.linear_model import linearmodel
+from meerkats.src.models.hannahcnn import HannahCNN
+from meerkats.src.models.cnn_16khz_seg import CNN_16KHz_Seg
+from meerkats.src.models.cnn_16khz_subseg import CNN_16KHz_Subseg
+from meerkats.src.models.Palazcnn import PalazCNN
 
 
-from src.utils.logmelfilterbankspectrum import LogMelFilterBankSpectrum
-from src.utils.featuresExtractor import featuresextraction
+from meerkats.src.utils.featuresExtractor import featuresextraction
 
-from src.data.nccrmeerkatsdataset import NCCRMeerkatsDataset
-from src.data.mfcc import mfccMeerkatsDataset
-from src.data.ut3dogsdataset import UT3dogsdataset
-from src.data.acousticeventsdataset import AEDataset
-from src.data.isabelmeerkatdataset import isabelMerkatDataset
+from meerkats.src.data.isabelmeerkatdataset import isabelMerkatDataset
 
 
 from transformers import Wav2Vec2Model
 import multiprocessing as mp
 
 import sys
-sys.path.append('../')
 
 from meerkats import config
 import warnings
@@ -49,7 +46,7 @@ warnings.filterwarnings("ignore")
 # Wanb
 
 # Map
-with open('/idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/workspace/src/data/class_to_index_isabel.json') as f:
+with open('/idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/meerkats/src/data/class_to_index_isabel1.json') as f:
     class_to_index = json.load(f)
 
 
@@ -79,7 +76,7 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-#wandb_logger = WandbLogger(name="test_1_RMS",project="Isabel_meerkat")
+wandb_logger = WandbLogger(name="mix4classes",project="Isabel_meerkat")
 EPOCHS = 100
 kfold=True
 
@@ -92,7 +89,7 @@ if __name__ == "__main__":
         
     # Data
     args=arg_parser()
-    print(config.GITROOT)
+    
     if args.model == None:
          transform=None
     else:
@@ -112,7 +109,7 @@ if __name__ == "__main__":
     
     #data_train=isabelMerkatDataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True,transform=transform)
     #,  transform= LogMelFilterBankSpectrum(frame_length=FRAME_LENGTH, hop_length=HOP_LENGTH))
-    import ipdb; ipdb.set_trace();
+    
     num_classes = len(set(class_to_index.values()))
     
     
@@ -150,14 +147,14 @@ if __name__ == "__main__":
         k_folds=5
         dataset=torch.utils.data.ConcatDataset([dataset_test,dataset_train])
         labels=dataset.datasets[0].filelist.class_index.tolist()+ dataset.datasets[1].filelist.class_index.tolist()
-        #kfold=StratifiedKFold(n_splits=k_folds,shuffle=True,random_state=42)
-        kfold=KFold(n_splits=5)
+        kfold=StratifiedKFold(n_splits=k_folds,shuffle=True,random_state=42)
+       # kfold=KFold(n_splits=5)
         if args.learning_rate is not None:
              learning_rates=[args.learning_rate]
         for lr in learning_rates:
                 accuracies_folds=[]
 
-                for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset)):
+                for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset,labels)):
                 
                         print(f'Fold {fold}')
                         #x=pd.concat((dataset.datasets[0].filelist,dataset.datasets[1].filelist))
@@ -212,7 +209,7 @@ if __name__ == "__main__":
    
         
 
-        with open('test_isabelRMS.pkl', 'wb') as f:
+        with open('mix_class_isabel.pkl', 'wb') as f:
                 pickle.dump(result, f)
         torch.cuda.empty_cache()
         
