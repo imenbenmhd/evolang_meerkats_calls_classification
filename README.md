@@ -14,9 +14,6 @@ The structure of this directory is organized as the following:
 ├── lib             # gitsubmodules used
 ├── README.md       # This file
 ├── experiments     # result of every experiment with the model checkpoint
-│   ├── data        # Dataloader files and any other mapping
-│   ├── models      # Model architectures              
-│   └── utils       # Training scripts for (mostly for regular PyTorch)
 ├── figs            # useful figures
 ├── LICENSES        # licenses of modules used
 ├── meerkats        # 
