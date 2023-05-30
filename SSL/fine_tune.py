@@ -131,6 +131,9 @@ def compute_metrics(eval_pred):
     accuracy = torch.sum(predicted_labels == labels).item() / len(labels)
     return {"accuracy": accuracy}
 
+
+
+
 if __name__ == "__main__":
     import ipdb; ipdb.set_trace()
     device = args.device

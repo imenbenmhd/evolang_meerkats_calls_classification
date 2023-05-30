@@ -1,5 +1,3 @@
-from asyncio.unix_events import BaseChildWatcher
-from traceback import print_tb
 from torchmetrics.functional import accuracy
 from torchmetrics import ConfusionMatrix
 from torchmetrics import Recall
@@ -10,6 +8,7 @@ import torch
 from meerkats import src
 from meerkats.src.utils import utils
 from meerkats.src.models.Palazcnn import PalazCNN
+from sklearn.metrics import classification_report
 
 
 import pandas as pd
@@ -19,7 +18,6 @@ class Lit(pl.LightningModule):
     def __init__(self,model,learning_rate,num_classes,fold=None,weight=None,framing=False,pretrained_model=None):
         super().__init__()
 
-       # self.model = PalazCNN(n_input=1,n_output=9,flatten_size=1)
         self.model= model
         self.probabilities=pd.DataFrame(columns=['probabilities','true'])
         self.fold=fold
@@ -104,12 +102,7 @@ class Lit(pl.LightningModule):
         preds,y=self.common_step(batch,batch_idx)
         m=nn.Sigmoid()
         proba=m(preds)
-        #new_row=pd.Series({"probabilities": proba.cpu().numpy(),"true": y.cpu().numpy()})
-        #self.probabilities=pd.concat([self.probabilities,new_row.to_frame().T],ignore_index=True)
-        #self.probabilities.to_pickle("/idiap/temp/ibmahmoud/evolang/proba.pkl")
-
-        #logits=logits.sum(axis=0).unsqueeze(0)
-
+        
         loss = nn.CrossEntropyLoss()
         test_loss=loss(preds,y)
         test_acc = accuracy(preds, y)
@@ -121,7 +114,7 @@ class Lit(pl.LightningModule):
             self.probabilities.to_pickle("/idiap/temp/ibmahmoud/evolang/result_44k_100ms_5ms_weighted_newarch"+str(self.fold)+".pkl")
         cm = self.calculate_confusion_matrix(y, preds_)
 
-        return {"confusion_matrix": cm},preds,y
+        return {"confusion_matrix": cm},preds_,y
 
 
 
@@ -140,22 +133,21 @@ class Lit(pl.LightningModule):
     # do something with the outputs of all test batches
 
         cm = sum([x["confusion_matrix"] for x,_,_ in outputs])
-        acc=self.unbalanced_accuracy(cm)
-        self.log("unbalanced accuracy", acc.item())
-
-        print(acc)
+        all_preds=[x for _,x,_ in outputs]
+        true_labels=[x for _,_,x in outputs]
+        all_preds=torch.cat(all_preds,dim=0)
+        all_true=torch.cat(true_labels,dim=0)
+        
         print(cm)
-        return acc.item()
+        metric=Recall(average='macro',num_classes=self.num_classes).to('cuda')
+        r=metric(all_preds,all_true)
+        self.log("recall", r.item())
+
+        return r.item()
         #numpy.savetxt("confusion_matrix.txt", cm, fmt="%d")
 
         
 
-
-    def unbalanced_accuracy(self,matrix):
-        accuracy=torch.diagonal(matrix) / torch.sum(matrix,dim=1)
-        print(accuracy)
-        accuracy=torch.sum(accuracy)/self.num_classes
-        return accuracy.to('cuda')
 
     def predict_step(self,batch,batch_idx):
         x,y=batch

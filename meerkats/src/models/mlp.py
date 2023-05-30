@@ -1,16 +1,21 @@
-from torch import nn
+from turtle import forward
+import torch
+import torch.nn as nn
 
-class MLP_3(nn.Module):
-        def __init__(self, n_input, n_hidden, n_output):
-            super().__init__()
-            self.linear_relu_stack = nn.Sequential(
-                nn.Linear(n_input, n_hidden),
-                nn.ReLU(),
-                nn.Linear(n_hidden, n_hidden),
-                nn.ReLU(),
-                nn.Linear(n_hidden, n_output)
-            )
-            
-        def forward(self, x):
-            x = self.linear_relu_stack(x)
-            return x
+
+
+class linearmodel(nn.Module):
+    def __init__(self,feat_dim,n_output):
+        super().__init__()
+        self.layer=nn.Sequential(nn.Flatten(),nn.Linear(feat_dim,128))
+        self.layer2=nn.Sequential(
+                    nn.LayerNorm(128),nn.ReLU(),nn.Linear(128,64),
+                    nn.LayerNorm(64),nn.ReLU(),nn.Linear(64,32),nn.ReLU(),nn.Linear(32,n_output))
+    
+
+    def forward(self,x):
+        x=self.layer(x)
+        x=self.layer2(x)
+
+        return x
+

@@ -46,7 +46,7 @@ warnings.filterwarnings("ignore")
 # Wanb
 
 # Map
-with open('/idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/meerkats/src/data/class_to_index_isabel1.json') as f:
+with open('/idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/meerkats/src/data/class_to_index_isabel.json') as f:
     class_to_index = json.load(f)
 
 
@@ -76,8 +76,8 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name="mix4classes",project="Isabel_meerkat")
-EPOCHS = 100
+wandb_logger = WandbLogger(name="testrecall",project="Isabel_meerkat")
+EPOCHS = 10
 kfold=True
 
 s3prl_dimensions={"wavlm" : 768, "hubert" : 768, "apc" : 512, "mockingjay" : 768, "npc" : 512, "wav2vec2": 768}
@@ -209,7 +209,7 @@ if __name__ == "__main__":
    
         
 
-        with open('mix_class_isabel.pkl', 'wb') as f:
-                pickle.dump(result, f)
-        torch.cuda.empty_cache()
+        # with open('mix_class_isabel.pkl', 'wb') as f:
+        #         pickle.dump(result, f)
+        # torch.cuda.empty_cache()
         

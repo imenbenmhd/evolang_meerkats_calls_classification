@@ -10,5 +10,5 @@
 **/mara_meerkat
 **/marta_meerkat
 **/marta-meerkat
-
+.nfs*
 meerkats/src/features_extraction/Compare2016.csv

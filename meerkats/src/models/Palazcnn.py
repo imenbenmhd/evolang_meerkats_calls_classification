@@ -27,13 +27,7 @@ class PalazCNN(nn.Module):
         self.adapt=nn.AdaptiveAvgPool1d(flatten_size) # arbitrary
         self.flatten=nn.Flatten()
         self.fc1   = nn.Linear(2*n_channel*flatten_size, n_output)
-       # self.relu4=nn.ReLU()
-       # self.fc2= nn.Linear(10, n_output)
-        #self.fc2 = nn.Linear(n_channel,n_output)
-        #lstm block
-        #self.lstm=nn.LSTM(2*n_channel*flatten_size,128)
-        #self.fc3=nn.Linear(128,n_output)
-        # self.sigmoid = nn.Sigmoid()
+       
 
     def forward(self, x):
         x = self.conv1(x)
@@ -53,13 +47,7 @@ class PalazCNN(nn.Module):
         x=self.flatten(x)
         intermediate=x
         x=self.fc1(x)
-       # x=self.relu4(x)
-       # x=self.fc2(x)
-        
-        #x=self.fc2(x)
-        #x=self.adapt(x)
-        #x=self.flatten(x)
-        #x = self.fc1(x)
+       
         return x
     
     
