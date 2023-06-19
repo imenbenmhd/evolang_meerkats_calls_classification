@@ -14,32 +14,26 @@ from pytorch_lightning.loggers import WandbLogger
 from torchaudio import transforms
 import numpy
 from sklearn.model_selection import StratifiedKFold
+import sys
+sys.path.append('../')
+from  meerkats import config
+
 from src.utils import utils
 from src.models.lit import Lit
 
-from src.models.linear_model import linearmodel
-from src.models.hannahcnn import HannahCNN
-from src.models.cnn_16khz_seg import CNN_16KHz_Seg
-from src.models.cnn_16khz_subseg import CNN_16KHz_Subseg
-from src.models.Palazcnn import PalazCNN
+from meerkats.src.models.linear_model import linearmodel
+from meerkats.src.models.Palazcnn import PalazCNN
 
 
-from src.utils.logmelfilterbankspectrum import LogMelFilterBankSpectrum
-from src.utils.featuresExtractor import featuresextraction
 
-from src.data.nccrmeerkatsdataset import NCCRMeerkatsDataset
-from src.data.mfcc import mfccMeerkatsDataset
-from src.data.ut3dogsdataset import UT3dogsdataset
-from src.data.acousticeventsdataset import AEDataset
-from src.data.isabelmeerkatdataset import isabelMerkatDataset
+from meerkats.src.data.nccrmeerkatsdataset import nccrMerkatDataset
 
 
-from transformers import Wav2Vec2Model
 
 # Wanb
 
 # Map
-with open('src/data/class_to_index_isabel.json') as f:
+with open('src/data/class_to_index_isabel.json') as f: # change the path of your json file
     class_to_index = json.load(f)
 
 
@@ -68,7 +62,7 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name="ADAM-pretrained-mara-on-isabel-fixingweights",project="Isabel_meerkat")
+wandb_logger = WandbLogger(name="ADAM-pretrained-mara-on-isabel-fixingweights",project="Isabel_meerkat") # change with your own project
 EPOCHS = 100
 kfold=True
 
@@ -79,42 +73,37 @@ if __name__ == "__main__":
     args=arg_parser()
     FRAME_LENGTH = 25 * args.sampling_rate // 1000
     HOP_LENGTH = 10 * args.sampling_rate // 1000
-    #transform = transforms.MFCC(sample_rate=args.sampling_rate, n_mfcc=40,melkwargs={"n_fft": 400, "hop_length": int(args.sampling_rate*0.002), "win_length": int(args.sampling_rate*0.005)})
-    #transform=featuresextraction(upstream="wavlm", layer=5)
-    transform=None
-    dataset_test=isabelMerkatDataset(
+    dataset_test=nccrMerkatDataset(
              audio_dir=args.input_dir,
              class_to_index=class_to_index,
              target_sample_rate=args.sampling_rate,
              train=False)
-    dataset_train=isabelMerkatDataset(
+    
+    dataset_train=nccrMerkatDataset(
             audio_dir=args.input_dir,
             class_to_index=class_to_index,
             target_sample_rate=args.sampling_rate,
             train=True)
     
-    #data_train=isabelMerkatDataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True,transform=transform)
-    #,  transform= LogMelFilterBankSpectrum(frame_length=FRAME_LENGTH, hop_length=HOP_LENGTH))
 
     num_classes = len(set(class_to_index.values()))
     
     
-    #effectif=(train_list.class_index.value_counts()).sort_index()
-    #weights=torch.tensor(max(effectif) / effectif, dtype=torch.float32)
-    # Split Val and test
-   
+  
 
-    # k-folds
     result={}
-    #learning_rates=numpy.arange(0.0001,0.0015,0.0001)
+
     if args.learning_rate is None:
         learning_rates=[0.0001,0.0002,0.0003,0.0004,0.0006,0.0008,0.001,0.0015,0.003,0.005]
     else: 
          learning_rates=[args.learning_rate]
+
     k_folds=5
+
     dataset=torch.utils.data.ConcatDataset([dataset_test,dataset_train])
     labels=dataset.datasets[0].filelist.class_index.tolist()+ dataset.datasets[1].filelist.class_index.tolist()
     kfold=StratifiedKFold(n_splits=k_folds,shuffle=True,random_state=42)
+
     for lr in learning_rates:
         accuracies_folds=[]
         accuracies_folds_mara=[]
@@ -122,7 +111,6 @@ if __name__ == "__main__":
             print(f'Fold {fold}')
             num_train=len(train_ids)
             split = int(numpy.floor(0.2* num_train))
-            #     numpy.random.shuffle(indices)
             train_idx, valid_idx = train_ids[split:], train_ids[:split]
             
             print(f'There are {len(test_ids)} data points in the test set and {num_classes} classes.')
@@ -154,12 +142,12 @@ if __name__ == "__main__":
             es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
             trainer = Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=75, enable_progress_bar=True)
             trainer_test= Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=75, enable_progress_bar=True)
-                #pretrained=Wav2Vec2Model.from_pretrained('facebook/wav2vec2-base-960h')
             
             for param in model_mara.model.parameters():
                 param.requires_grad = False
             model_mara.model.fc1=nn.Linear(80,6)
             model_mara.num_classes=6
+
             trainer.tune(model_mara,train_dataloaders=train_loader)
             trainer.fit(model_mara, train_dataloaders=train_loader,val_dataloaders=val_loader)
             trainer.validate(model_mara, ckpt_path='best', dataloaders=val_loader)

@@ -17,6 +17,7 @@ import pandas as pd
 from sklearn.model_selection import KFold
 import pickle
 import sys
+
 sys.path.append('../')
 
 from meerkats.src.utils import utils
@@ -24,19 +25,13 @@ from meerkats.src.models.lit import Lit
 import random
 
 from meerkats.src.models.linear_model import linearmodel
-from meerkats.src.models.hannahcnn import HannahCNN
-from meerkats.src.models.cnn_16khz_seg import CNN_16KHz_Seg
-from meerkats.src.models.cnn_16khz_subseg import CNN_16KHz_Subseg
 from meerkats.src.models.Palazcnn import PalazCNN
 
 
-from meerkats.src.utils.featuresExtractor import featuresextraction
 
-from meerkats.src.data.isabelmeerkatdataset import isabelMerkatDataset
+from meerkats.src.data.nccrmeerkatsdataset import nccrMerkatDataset
 
 
-from transformers import Wav2Vec2Model
-import multiprocessing as mp
 
 import sys
 
@@ -46,7 +41,7 @@ warnings.filterwarnings("ignore")
 # Wanb
 
 # Map
-with open('/idiap/project/evolang/meerkats_imen/evolang_meerkats_calls_classification/meerkats/src/data/class_to_index_isabel.json') as f:
+with open(config.GITROOT + '/meerkats/src/data/class_to_index_isabel.json') as f:  # to change everytime to adapt to the experience
     class_to_index = json.load(f)
 
 
@@ -56,7 +51,7 @@ def arg_parser():
         group.add_argument(
                 '-dir',
                 '--input_dir',
-                help='the directory of the files to classify')
+                help='the path of the info file that contrains the paths and labels to classify')
         parser.add_argument(
         '-s',
         '--sampling_rate',type=int,
@@ -71,18 +66,15 @@ def arg_parser():
         help='To frame the segment into 100ms frames or not')
 
 
-        parser.add_argument('-lr','--learning_rate',type=float,help="the learning rate to use",default=None)
-        parser.add_argument('-m','--model',default=None)
+        parser.add_argument('-lr','--learning_rate',type=float,help="the learning rate to use, if not given it will test a list a learning rates",default=None)
         args=parser.parse_args()
         return args
 
 wandb_logger = WandbLogger(name="testrecall",project="Isabel_meerkat")
 EPOCHS = 10
-kfold=True
+kfold=True # to change if not using kfold
 
-s3prl_dimensions={"wavlm" : 768, "hubert" : 768, "apc" : 512, "mockingjay" : 768, "npc" : 512, "wav2vec2": 768}
 
-learning_rates=[0.0001,0.0002,0.0003,0.0004,0.0006,0.0008,0.001,0.0015,0.003,0.005]
 
 random.seed(42)
 if __name__ == "__main__":
@@ -90,38 +82,30 @@ if __name__ == "__main__":
     # Data
     args=arg_parser()
     
-    if args.model == None:
-         transform=None
-    else:
-        transform=featuresextraction(upstream=args.model, layer=5)
-        
-    dataset_test=isabelMerkatDataset(
+    
+    dataset_test=nccrMerkatDataset(
              audio_dir=args.input_dir,
              class_to_index=class_to_index,
              target_sample_rate=args.sampling_rate,
              train=False)
-    dataset_train=isabelMerkatDataset(
+
+    dataset_train=nccrMerkatDataset(
             audio_dir=args.input_dir,
             class_to_index=class_to_index,
             target_sample_rate=args.sampling_rate,
             train=True)
     
-    
-    #data_train=isabelMerkatDataset(audio_dir=args.input_dir,class_to_index=class_to_index,target_sample_rate=args.sampling_rate,train=True,transform=transform)
-    #,  transform= LogMelFilterBankSpectrum(frame_length=FRAME_LENGTH, hop_length=HOP_LENGTH))
+
     
     num_classes = len(set(class_to_index.values()))
     
     
-    #effectif=(train_list.class_index.value_counts()).sort_index()
-    #weights=torch.tensor(max(effectif) / effectif, dtype=torch.float32)
-    # Split Val and test
     
     if kfold==False:
-        val_size = int(0.4* len(data_test))
-        test_size = len(data_test) - val_size
+        val_size = int(0.4* len(dataset_test))
+        test_size = len(dataset_test) - val_size
         seed = torch.Generator().manual_seed(42)
-        val_dataset, test_dataset = torch.utils.data.random_split(data_test, [val_size, test_size], generator=seed)
+        val_dataset, test_dataset = torch.utils.data.random_split(dataset_test, [val_size, test_size], generator=seed)
 
         print(f'There are {len(data_test)} data points in the test set and {num_classes} classes.')
         print(f'There are {len(data_train)} data points in the train set and {num_classes} classes.')
@@ -144,42 +128,35 @@ if __name__ == "__main__":
     else:
     # k-folds
         result={}
+
         k_folds=5
+
         dataset=torch.utils.data.ConcatDataset([dataset_test,dataset_train])
+
         labels=dataset.datasets[0].filelist.class_index.tolist()+ dataset.datasets[1].filelist.class_index.tolist()
+
         kfold=StratifiedKFold(n_splits=k_folds,shuffle=True,random_state=42)
-       # kfold=KFold(n_splits=5)
         if args.learning_rate is not None:
              learning_rates=[args.learning_rate]
+
         for lr in learning_rates:
                 accuracies_folds=[]
 
                 for fold,(train_ids,test_ids) in enumerate(kfold.split(dataset,labels)):
                 
                         print(f'Fold {fold}')
-                        #x=pd.concat((dataset.datasets[0].filelist,dataset.datasets[1].filelist))
+                        
                         num_train = len(train_ids)
-                        #indices = list(range(num_train))
+                        
                         split = int(numpy.floor(0.2* num_train))
-                        #numpy.random.shuffle(indices)
+                    
                         train_idx, valid_idx = train_ids[split:], train_ids[:split]
 
-                        # mask=dataset.filelist.index.isin(train_ids)
-                        # dataset_=dataset.filelist[mask] 
-                        # all_ids=numpy.arange(0,len(dataset))
-                        # mask=x.index.isin(train_ids)
-                        # dataset_=x[mask]
-                        # for k, (train_idx, valid_idx) in enumerate(kfold.split(dataset_,dataset_.class_index)):
-                        #         train_ids=train_idx
-                        #         break
-                        # all_ids=numpy.arange(0,len(dataset))
-                        # keep_mask=numpy.isin(all_ids,test_ids,invert=True)
-                        # new_ids=all_ids[keep_mask]
-                        # train_ids=new_ids[train_ids]
-                        # valid_idx=new_ids[valid_idx]
+                        
                         print(f'There are {len(test_ids)} data points in the test set and {num_classes} classes.')
                         print(f'There are {len(train_idx)} data points in the train set and {num_classes} classes.')
                         print(f'There are {len(valid_idx)} data points in the validation set and {num_classes} classes.')
+
                         train_subsampler=torch.utils.data.SubsetRandomSampler(train_idx)
                         val_subsampler=torch.utils.data.SubsetRandomSampler(valid_idx)
                         test_subsampler=torch.utils.data.SubsetRandomSampler(test_ids)
@@ -194,10 +171,7 @@ if __name__ == "__main__":
                         es =pl.callbacks.early_stopping.EarlyStopping(monitor="train_acc", mode="max", patience=20)
                         trainer = Trainer(logger=wandb_logger,accelerator='gpu', devices=1, max_epochs=EPOCHS, log_every_n_steps=75, enable_progress_bar=True)
                         #pretrained=Wav2Vec2Model.from_pretrained('facebook/wav2vec2-base-960h')
-                        if transform is not None:
-                                model = Lit(linearmodel(s3prl_dimensions[args.model],num_classes),lr,num_classes=num_classes,framing=args.framing,pretrained_model=None)
-                        else:
-                                model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),lr,num_classes=num_classes,framing=args.framing)
+                        model = Lit(PalazCNN(n_input=1,n_output=num_classes,flatten_size=1),lr,num_classes=num_classes,framing=args.framing)
 
                         trainer.tune(model,train_dataloaders=train_loader)
                         trainer.fit(model, train_dataloaders=train_loader,val_dataloaders=val_loader)

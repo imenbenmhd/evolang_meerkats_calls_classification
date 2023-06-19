@@ -17,7 +17,7 @@ from meerkats import config
 from meerkats import src
 from meerkats.src.models.Palazcnn import PalazCNN
 from meerkats.src.models.lit import Lit
-from meerkats.src.data.isabelmeerkatdataset import isabelMerkatDataset
+from meerkats.src.data.nccrmeerkatdataset import nccrMerkatDataset
 from meerkats.src.utils import utils
 
 from torch.utils.data import DataLoader, ConcatDataset
@@ -83,13 +83,13 @@ def get_dataset(args):
         class_to_index = json.load(f)
     path_data=config.DATADIR + args.data
     
-    data_test = isabelMerkatDataset(
+    data_test = nccrMerkatDataset(
         audio_dir=path_data, class_to_index=class_to_index,
         target_sample_rate=16000,
         train=False) 
    
     
-    data_train = isabelMerkatDataset(
+    data_train = nccrMerkatDataset(
         audio_dir=path_data,
         class_to_index=class_to_index,
         target_sample_rate=16000,
@@ -101,14 +101,16 @@ def get_dataset(args):
 
 
 
-def extract_last_layer(args,dataset):
+def extract_embeddings(args,dataset):
 
         lit=Lit(model=PalazCNN(n_input=1,n_output=int(args.classes)),num_classes=int(args.classes),learning_rate=float(args.learning_rate))
 
-        checkpoint=torch.load(args.model,map_location=torch.device('cpu')) #best marta model
+        checkpoint=torch.load(args.model,map_location=torch.device('cpu')) #load the checkpoint given as argument
         lit.load_state_dict(checkpoint["state_dict"])
         lit.model.eval()
+
         loader = DataLoader(dataset, batch_size=1,shuffle=False,collate_fn=utils.collate_fn, num_workers=4)
+
         FEATS=[] # list of all the features
         
         for batch in iter(loader):
@@ -116,12 +118,15 @@ def extract_last_layer(args,dataset):
             pred,intermediate=lit.model(x)
             output=np.c_[intermediate.detach().numpy(),y.detach().numpy()]
             FEATS.append(output)
+
         FEATS=np.array(FEATS)
         FEATS=FEATS.reshape((FEATS.shape[0]*FEATS.shape[1]), FEATS.shape[2]) # final features numpy
         df=pd.DataFrame(FEATS)
+
         return df
                
 def extract_other_features(args,filelist):
+
     if args.name=="egemaps":
         smile=opensmile.Smile(feature_set=opensmile.FeatureSet.eGeMAPSv02,feature_level=opensmile.FeatureLevel.Functionals)
 
@@ -130,17 +135,21 @@ def extract_other_features(args,filelist):
         smile=opensmile.Smile(feature_set=opensmile.FeatureSet.ComParE_2016,feature_level=opensmile.FeatureLevel.Functionals)
 
     FEATS=[]
+
     for idx,finwav in enumerate(filelist.path):
         signal,fs=sf.read(finwav)
         audio_length=len(signal) / fs
-        if audio_length < 0.1:
+
+        if audio_length < 0.1: # if length of file less than 100 ms
             repeat_times=int(0.1/audio_length) + 1
             signal=np.concatenate((np.array([signal]*repeat_times)),axis=0)
         features_=smile.process_signal(signal,fs)
         FEATS.append(features_.iloc[0].values)
+
     labels=filelist.class_index
     FEATS=np.array(FEATS)
     labels=np.array(labels)[:,None]
+
     FEATS=np.append(FEATS,labels,axis=1)
     df=pd.DataFrame(FEATS)
     return df
@@ -175,8 +184,8 @@ if __name__== "__main__":
     dataset=get_dataset(args)
     filelist=pd.concat((dataset.datasets[0].filelist,dataset.datasets[1].filelist))
 
-    if args.name == "lastlayer":
-        df=extract_last_layer(args,dataset)
+    if args.name == "embeddings":
+        df=extract_embeddings(args,dataset)
 
     if args.name=="catch":
         df=extract_catch(filelist)
