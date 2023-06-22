@@ -24,7 +24,6 @@ from meerkats.src.utils import utils
 from meerkats.src.models.lit import Lit
 import random
 
-from meerkats.src.models.linear_model import linearmodel
 from meerkats.src.models.Palazcnn import PalazCNN
 
 
@@ -46,7 +45,7 @@ with open(config.GITROOT + '/meerkats/src/data/class_to_index_isabel.json') as f
 
 
 def arg_parser():
-        parser=argparse.ArgumentParser()
+        parser=argparse.ArgumentParser(description="try something here")
         group=parser.add_mutually_exclusive_group(required=False)
         group.add_argument(
                 '-dir',
@@ -70,16 +69,17 @@ def arg_parser():
         args=parser.parse_args()
         return args
 
-wandb_logger = WandbLogger(name="testrecall",project="Isabel_meerkat")
-EPOCHS = 10
-kfold=True # to change if not using kfold
-
 
 
 random.seed(42)
 if __name__ == "__main__":
         
     # Data
+    #wandb_logger = WandbLogger(name="testrecall",project="Isabel_meerkat")
+    EPOCHS = 10
+    kfold=True # to change if not using kfold
+
+
     args=arg_parser()
     
     
