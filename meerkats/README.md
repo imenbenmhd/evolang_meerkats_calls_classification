@@ -35,9 +35,16 @@ model = Lit(PalazCNN(n_input=n_input, n_output=num_classes),learning_rate,num_cl
 ```
 
 ## To Extract features:
+If feature_name is compare catch or egemaps.
+
 ```
-python src/features_extraction/extract_feats_segments.py -n feature_name -d path_toinfofile.csv -i class_to_index.json -p features/
+python src/features_extraction/extract_feats_segments.py -n feature_name -d path_toinfofile.csv -i class_to_index.json -p features/ -c number_of_classes 
 ```
 
-feature_name is egemaps or compare or catch or embeddings. If embeddings then add -m path_to_model_checkpoint after -n 
+if feature_name is embeddings:
 
+```
+python src/features_extraction/extract_feats_segments.py -n embeddings -m path_model_checkpoint -d path_csvfile.csv -i path_class_to_index.json -p features/ -c number_classes -lr learning_rate_model
+```
+
+When we want to extract embeddings we need to add the path of the model checkpoint and the learning rate of the model.

@@ -36,12 +36,22 @@ Run the script to use the end-to-end CNN approach with pytorch-lightening:
 python scripts/train_lit.py -dir info_file.csv -s sampling_rate -b batch_size -lr learning_rate # Run CNN classification script 
 ```
 
-Structure of info_file.csv must be :
+Structure of info_file.csv must be :\
  
-path,labels,...
-segment_1.wav,alarm,..
-segment_2.wav,grooming,..
-..,...
+path,labels,...\
+segment_1.wav,alarm,..\
+segment_2.wav,grooming,..\
+..,...\
+
+A class_to_index.json file should be added to your data :\
+{
+"alarm": 0,\
+"grooming": 1,\
+...:..,\
+}\
+
+
+
 
 ### RF or SVM on feature set:
 

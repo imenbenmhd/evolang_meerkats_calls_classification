@@ -6,19 +6,18 @@ import soundfile as sf
 import opensmile
 import librosa
 import json
-
 import torch
 import sys
 import pycatch22
 
+sys.path.append('../../')
 
-from meerkats import config
+import config
 
-from meerkats import src
-from meerkats.src.models.Palazcnn import PalazCNN
-from meerkats.src.models.lit import Lit
-from meerkats.src.data.nccrmeerkatdataset import nccrMerkatDataset
-from meerkats.src.utils import utils
+from src.models.Palazcnn import PalazCNN
+from src.models.lit import Lit
+from src.data.nccrmeerkatsdataset import nccrMerkatDataset
+from src.utils import utils
 
 from torch.utils.data import DataLoader, ConcatDataset
 import pandas as pd
@@ -35,13 +34,13 @@ def get_argument_parser():
     parser = argparse.ArgumentParser(
         description="name of feature to extract"
     )
-    parser.add_argument("-n","--name",help="name of the feature to extract")
+    parser.add_argument("-n","--name",help="name of the feature to extract, compare egemap catch or embeddings")
 
     parser.add_argument(
         "-m",
         "--model",
         help=
-        "if last layer path of the model of the best one", default=None
+        "if feature name is embeddings, path of the best model checkpoint", default=None
     )
 
     parser.add_argument( "-d","--data", help=" path of the .csv file for the data "

@@ -5,9 +5,11 @@ import torch.nn.functional as F
 import pytorch_lightning as pl
 import torch.nn as nn
 import torch
-from meerkats import src
-from meerkats.src.utils import utils
-from meerkats.src.models.Palazcnn import PalazCNN
+import sys
+sys.path.append('../')
+
+from src.utils import utils
+from src.models.Palazcnn import PalazCNN
 from sklearn.metrics import classification_report
 
 
