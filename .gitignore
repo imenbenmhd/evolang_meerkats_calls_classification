@@ -12,3 +12,4 @@
 **/marta-meerkat
 .nfs*
 meerkats/src/features_extraction/Compare2016.csv
+.gitattributes

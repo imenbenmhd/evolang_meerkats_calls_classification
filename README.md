@@ -1,4 +1,5 @@
 # Meerkats Call-Type Classification
+
 The goal of this project is to see if there is a difference of structure between the calls that meerkats make in the differents situations that they face in the wildlife : Alarm, sunning, grooming etc
 
 Project start : Febuary 2022
@@ -35,23 +36,22 @@ Run the script to use the end-to-end CNN approach with pytorch-lightening:
 ```
 python scripts/train_lit.py -dir info_file.csv -s sampling_rate -b batch_size -lr learning_rate # Run CNN classification script 
 ```
-
-Structure of info_file.csv must be :
- 
-path,labels,...\
-segment_1.wav,alarm,..\
-segment_2.wav,grooming,..\
-..,...
-
-A class_to_index.json file should be added to your data :\
-{
-"alarm": 0,\
-"grooming": 1,\
-...:..,\
-}
+Structure of info_file.csv must be:
+	
+	|path	       |labels|other_columns|..|
+	|segment_1.wav |al    |value1	    |..|
+	|segment_2.wav |gr    |value2       |..|
+        |...	       |..    |..           |..|
 
 
+A class_to_index.json file should be created for your data to correspond a label to an index, for example:
 
+```json
+{ "alarm":	0,
+  "grooming":	1,
+  "sunning":	2
+ }
+```
 
 ### RF or SVM on feature set:
 
@@ -63,3 +63,9 @@ To have more information about the arguments, run:
 ```
 python scripts/train_svm.py --help
 ```
+
+## Contact:
+
+If you have a question, or an issue, please contact the [author](mailto:imen.benmhd@gmail.com)
+
+
